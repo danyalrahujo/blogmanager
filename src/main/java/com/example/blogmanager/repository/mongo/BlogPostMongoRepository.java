@@ -1,5 +1,6 @@
 package com.example.blogmanager.repository.mongo;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.bson.Document;
@@ -29,7 +30,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	@Override
 	public List<BlogPost> findAll() {
 		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
