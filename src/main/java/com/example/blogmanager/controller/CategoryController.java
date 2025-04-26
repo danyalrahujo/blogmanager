@@ -1,29 +1,33 @@
 package com.example.blogmanager.controller;
 
+import com.example.blogmanager.repository.CategoryRepository;
 import java.util.List;
-
 import com.example.blogmanager.model.Category;
 
 public class CategoryController {
+	private CategoryRepository categoryRepository;
+
+	public CategoryController(CategoryRepository categoryRepository) {
+		this.categoryRepository = categoryRepository;
+	}
 
 	public void createCategory(Category category) {
-		// TODO Auto-generated method stub
-		
+		categoryRepository.save(category);
 	}
 
 	public List<Category> getAllCategories() {
-		// TODO Auto-generated method stub
-		return null;
+		return categoryRepository.findAll();
 	}
 
-	public Category getCategoryById(String string) {
-		// TODO Auto-generated method stub
-		return null;
+	public Category getCategoryById(String id) {
+		return categoryRepository.findById(id);
 	}
 
-	public void deleteCategory(String string) {
-		// TODO Auto-generated method stub
-		
+	public void updateCategory(Category category) {
+		categoryRepository.update(category);
 	}
 
+	public void deleteCategory(String id) {
+		categoryRepository.delete(id);
+	}
 }
