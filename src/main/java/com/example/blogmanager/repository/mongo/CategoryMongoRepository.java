@@ -1,7 +1,8 @@
 package com.example.blogmanager.repository.mongo;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.bson.Document;
 
@@ -30,7 +31,8 @@ public class CategoryMongoRepository implements CategoryRepository {
 	@Override
 	public List<Category> findAll() {
 		// TODO Auto-generated method stub
-		return Collections.emptyList();
+		return StreamSupport.stream(categoryCollection.find().spliterator(), false)
+				.map(d -> new Category("" + d.get("id"), "" + d.get("name"))).collect(Collectors.toList());
 
 	}
 

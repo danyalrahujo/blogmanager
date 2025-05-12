@@ -1,11 +1,13 @@
 package com.example.blogmanager.repository.mongo;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.bson.Document;
 
 import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.BlogPostRepository;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -30,7 +32,21 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	@Override
 	public List<BlogPost> findAll() {
 		// TODO Auto-generated method stub
-		return Collections.emptyList();
+		return StreamSupport.stream(blogPostCollection.find().spliterator(), false).map(d -> {
+			// top-level fields
+			String id = d.getString("id");
+			String title = d.getString("title");
+			String content = d.getString("content");
+			String author = d.getString("author");
+			String creationDate = d.getString("creationDate");
+
+			// embedded Category sub-document
+			Document catDoc = d.get("category", Document.class);
+			Category category = catDoc == null ? null : new Category(catDoc.getString("id"), catDoc.getString("name"));
+
+			// build your BlogPost
+			return new BlogPost(id, title, content, author, creationDate, category);
+		}).collect(Collectors.toList());
 
 	}
 
