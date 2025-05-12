@@ -31,6 +31,7 @@ public class CategoryMongoRepository implements CategoryRepository {
 	public List<Category> findAll() {
 		// TODO Auto-generated method stub
 		return Collections.emptyList();
+
 	}
 
 	@Override

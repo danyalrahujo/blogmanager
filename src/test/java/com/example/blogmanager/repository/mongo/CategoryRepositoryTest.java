@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.example.blogmanager.model.Category;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
@@ -58,6 +59,20 @@ public class CategoryRepositoryTest {
 	@Test
 	public void testFindAllWhenDatabaseIsEmpty() {
 		assertThat(categoryMongoRepository.findAll()).isEmpty();
+	}
+
+	@Test
+	public void testFindAllWhenDatabaseIsNotEmpty() {
+		addTestCategoryToDatabase("1", "Tech");
+		addTestCategoryToDatabase("2", "News");
+
+		assertThat(categoryMongoRepository.findAll()).containsExactly(new Category("1", "Tech"),
+				new Category("2", "News"));
+	}
+
+	private void addTestCategoryToDatabase(String id, String name) {
+		categoryCollection.insertOne(new Document().append("id", id) // ← Mongo’s real primary‐key field
+				.append("name", name));
 	}
 
 }

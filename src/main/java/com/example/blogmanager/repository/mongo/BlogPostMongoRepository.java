@@ -31,6 +31,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	public List<BlogPost> findAll() {
 		// TODO Auto-generated method stub
 		return Collections.emptyList();
+
 	}
 
 	@Override

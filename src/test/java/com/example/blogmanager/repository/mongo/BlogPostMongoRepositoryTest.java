@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.example.blogmanager.model.BlogPost;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
@@ -58,6 +59,24 @@ public class BlogPostMongoRepositoryTest {
 	@Test
 	public void testFindAllWhenDatabaseIsEmpty() {
 		assertThat(blogPostMongoRepository.findAll()).isEmpty();
+	}
+
+	@Test
+	public void testFindAllWhenDatabaseIsNotEmpty() {
+		// insert two documents into the raw Mongo collection
+		addTestBlogPostToDatabase("1", "Hello", "First post", "cat1");
+		addTestBlogPostToDatabase("2", "Goodbye", "Second post", "cat2");
+		// now our repository should pick them up in the same order
+		assertThat(blogPostMongoRepository.findAll()).containsExactly(
+				new BlogPost("1", "Hello", "First post", "cat1", null, null),
+				new BlogPost("2", "Goodbye", "Second post", "cat2", null, null));
+	}
+
+	private void addTestBlogPostToDatabase(String id, String title, String content, String author) {
+		blogPostCollection.insertOne(new Document().append("id", id).append("title", title).append("content", content)
+				.append("author", author)
+		// omit creationDate & category so they remain null in the mapped object
+		);
 	}
 
 }
