@@ -1,5 +1,7 @@
 package com.example.blogmanager.repository.mongo;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -16,7 +18,7 @@ public class CategoryMongoRepository implements CategoryRepository {
 	public static final String CATEGORY_COLLECTION_NAME = "category";
 	public static final String CATEGORY_DB_NAME = "blogDatabase";
 
-	private MongoCollection<Document> categoryCollection;
+	private final MongoCollection<Document> categoryCollection;
 
 	public CategoryMongoRepository(MongoClient client) {
 		categoryCollection = client.getDatabase(CATEGORY_DB_NAME).getCollection(CATEGORY_COLLECTION_NAME);
@@ -24,34 +26,36 @@ public class CategoryMongoRepository implements CategoryRepository {
 
 	@Override
 	public void save(Category category) {
-		// TODO Auto-generated method stub
-
+		Document doc = new Document().append("id", category.getId()).append("name", category.getName());
+		categoryCollection.insertOne(doc);
 	}
 
 	@Override
 	public List<Category> findAll() {
-		// TODO Auto-generated method stub
-		return StreamSupport.stream(categoryCollection.find().spliterator(), false)
-				.map(d -> new Category("" + d.get("id"), "" + d.get("name"))).collect(Collectors.toList());
-
+		return StreamSupport.stream(categoryCollection.find().spliterator(), false).map(this::documentToCategory)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Category findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		Document d = categoryCollection.find(eq("id", id)).first();
+		return d == null ? null : documentToCategory(d);
 	}
 
 	@Override
 	public void update(Category category) {
-		// TODO Auto-generated method stub
-
+		Document update = new Document("name", category.getName());
+		categoryCollection.updateOne(eq("id", category.getId()), new Document("$set", update));
 	}
 
 	@Override
 	public void delete(String id) {
-		// TODO Auto-generated method stub
-
+		categoryCollection.deleteOne(eq("id", id));
 	}
 
+	private Category documentToCategory(Document d) {
+		String id = d.getString("id");
+		String name = d.getString("name");
+		return new Category(id, name);
+	}
 }
