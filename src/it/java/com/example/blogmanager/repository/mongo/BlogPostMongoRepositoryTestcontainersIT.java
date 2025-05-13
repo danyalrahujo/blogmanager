@@ -1,6 +1,7 @@
 package com.example.blogmanager.repository.mongo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -10,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MongoDBContainer;
 
 import com.example.blogmanager.model.BlogPost;
 import com.mongodb.MongoClient;
@@ -18,12 +19,9 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-
 public class BlogPostMongoRepositoryTestcontainersIT {
-
-	@SuppressWarnings({ "rawtypes"})
 	@ClassRule
-	public static final GenericContainer mongo = new GenericContainer("mongo:4.4.3").withExposedPorts(27017);
+	public static final MongoDBContainer mongo = new MongoDBContainer("mongo:4.4.3");
 
 	private MongoClient client;
 	private BlogPostMongoRepository blogPostRepository;
@@ -34,7 +32,7 @@ public class BlogPostMongoRepositoryTestcontainersIT {
 		client = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
 		blogPostRepository = new BlogPostMongoRepository(client);
 		MongoDatabase database = client.getDatabase(BlogPostMongoRepository.BLOG_DB_NAME);
-		// make sure we always start with a clean database
+
 		database.drop();
 		blogPostCollection = database.getCollection(BlogPostMongoRepository.BLOG_COLLECTION_NAME);
 	}

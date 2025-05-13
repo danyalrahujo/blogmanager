@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MongoDBContainer;
 
 import com.example.blogmanager.model.Category;
 import com.mongodb.MongoClient;
@@ -23,9 +23,8 @@ import org.junit.BeforeClass;
 
 public class CategoryMongoRepositoryTestcontainersIT {
 
-	@SuppressWarnings("rawtypes")
 	@ClassRule
-	public static final GenericContainer mongo = new GenericContainer("mongo:4.4.3").withExposedPorts(27017);
+	public static final MongoDBContainer mongo = new MongoDBContainer("mongo:4.4.3");
 
 	private MongoClient client;
 	private CategoryMongoRepository categoryRepository;
