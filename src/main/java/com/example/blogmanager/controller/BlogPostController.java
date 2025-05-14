@@ -1,55 +1,55 @@
 package com.example.blogmanager.controller;
 
-import com.example.blogmanager.repository.CategoryRepository;
+import com.example.blogmanager.view.BlogPostView;
 import com.example.blogmanager.repository.BlogPostRepository;
 
-import java.util.List;
-
 import com.example.blogmanager.model.BlogPost;
-import com.example.blogmanager.model.Category;
 
 public class BlogPostController {
 
+	private BlogPostView blogPostView;
 	private BlogPostRepository blogPostRepository;
-	private CategoryRepository categoryRepository;
 
-	public BlogPostController(BlogPostRepository blogPostRepository, CategoryRepository categoryRepository) {
+	public BlogPostController(BlogPostView blogPostView, BlogPostRepository blogPostRepository) {
+		this.blogPostView = blogPostView;
 		this.blogPostRepository = blogPostRepository;
-		this.categoryRepository = categoryRepository;
 	}
 
-	public void createBlogPost(BlogPost blogPost, String categoryId) {
-		Category category = categoryRepository.findById(categoryId);
-		if (category != null) {
-			blogPost.setCategory(category);
-			blogPostRepository.save(blogPost); 
-		} else {
-			System.out.println("Category not found!");
+	public void getAllBlogPosts() {
+		blogPostView.displayBlogPosts(blogPostRepository.findAll());
+	}
+
+	public void addBlogPost(BlogPost blogPost) {
+		BlogPost existingBlogPost = blogPostRepository.findById(blogPost.getId());
+		if (existingBlogPost != null) {
+			blogPostView.showErrorMessage("Blog post with ID " + blogPost.getId() + " already exists.", blogPost);
+			return;
 		}
+
+		blogPostRepository.save(blogPost);
+		blogPostView.addBlogPost(blogPost);
 	}
 
-	
-	public List<BlogPost> getAllPosts() {
-		return blogPostRepository.findAll();
+	public void deleteBlogPost(BlogPost blogPost) {
+		BlogPost existingBlogPost = blogPostRepository.findById(blogPost.getId());
+		if (existingBlogPost == null) {
+			blogPostView.showErrorMessage("No blog post found with ID " + blogPost.getId(), blogPost);
+			return;
+		}
+
+		blogPostRepository.delete(blogPost.getId());
+		blogPostView.deleteBlogPost(blogPost);
 	}
 
-	
-	public BlogPost getPostById(String id) {
-		return blogPostRepository.findById(id);
-	}
+	public void updateBlogPost(BlogPost blogPost) {
+		BlogPost existingBlogPost = blogPostRepository.findById(blogPost.getId());
+		if (existingBlogPost == null) {
+			blogPostView.showErrorMessage("No blog post found with ID " + blogPost.getId(), blogPost);
+			return;
+		}
 
-	
-	public void updatePost(BlogPost blogPost) {
 		blogPostRepository.update(blogPost);
-	}
-
-		public void deletePost(String id) {
-		blogPostRepository.delete(id);
-	}
-
-
-	public List<BlogPost> getPostsByCategory(String categoryId) {
-		return blogPostRepository.findByCategory(categoryId); 
+		blogPostView.updateBlogPost(blogPost);
 	}
 
 }

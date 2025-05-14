@@ -1,33 +1,54 @@
 package com.example.blogmanager.controller;
 
 import com.example.blogmanager.repository.CategoryRepository;
-import java.util.List;
+import com.example.blogmanager.view.CategoryView;
+
+
 import com.example.blogmanager.model.Category;
 
 public class CategoryController {
+	private CategoryView categoryView;
 	private CategoryRepository categoryRepository;
 
-	public CategoryController(CategoryRepository categoryRepository) {
+	public CategoryController(CategoryView categoryView, CategoryRepository categoryRepository) {
+		this.categoryView = categoryView;
 		this.categoryRepository = categoryRepository;
 	}
 
-	public void createCategory(Category category) {
+	public void getAllCategories() {
+		categoryView.displayCategories(categoryRepository.findAll());
+	}
+
+	public void addCategory(Category category) {
+		Category existingCategory = categoryRepository.findById(category.getId());
+		if (existingCategory != null) {
+			categoryView.showErrorMessage("Category with ID " + category.getId() + " already exists.", category);
+			return;
+		}
+
 		categoryRepository.save(category);
+		categoryView.addCategory(category);
 	}
 
-	public List<Category> getAllCategories() {
-		return categoryRepository.findAll();
-	}
+	public void deleteCategory(Category category) {
+		Category existingCategory = categoryRepository.findById(category.getId());
+		if (existingCategory == null) {
+			categoryView.showErrorMessage("No category found with ID " + category.getId(), category);
+			return;
+		}
 
-	public Category getCategoryById(String id) {
-		return categoryRepository.findById(id);
+		categoryRepository.delete(category.getId());
+		categoryView.deleteCategory(category);
 	}
 
 	public void updateCategory(Category category) {
-		categoryRepository.update(category);
-	}
+		Category existingCategory = categoryRepository.findById(category.getId());
+		if (existingCategory == null) {
+			categoryView.showErrorMessage("No category found with ID " + category.getId(), category);
+			return;
+		}
 
-	public void deleteCategory(String id) {
-		categoryRepository.delete(id);
+		categoryRepository.update(category);
+		categoryView.updateCategory(category);
 	}
 }
