@@ -183,6 +183,7 @@ public class BlogPostSwingView extends JFrame {
 		BlogPostTxtCreationDate.setColumns(10);
 
 		createBtn = new JButton("Create");
+		createBtn.setEnabled(false);
 		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
 		gbc_btnNewButton_1.anchor = GridBagConstraints.WEST;
 		gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 5);
@@ -191,6 +192,7 @@ public class BlogPostSwingView extends JFrame {
 		contentPane.add(createBtn, gbc_btnNewButton_1);
 
 		clearBtn = new JButton("Clear");
+		clearBtn.setEnabled(false);
 		clearBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
@@ -217,6 +219,7 @@ public class BlogPostSwingView extends JFrame {
 		list_1.setName("BlogPostList");
 
 		deleteBtn = new JButton("Delete");
+		deleteBtn.setEnabled(false);
 		deleteBtn.setName("");
 		GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
 		gbc_btnNewButton_3.anchor = GridBagConstraints.WEST;
@@ -226,6 +229,7 @@ public class BlogPostSwingView extends JFrame {
 		contentPane.add(deleteBtn, gbc_btnNewButton_3);
 
 		updateBtn = new JButton("Update");
+		updateBtn.setEnabled(false);
 		updateBtn.setName("");
 		GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
 		gbc_btnNewButton_2.fill = GridBagConstraints.HORIZONTAL;

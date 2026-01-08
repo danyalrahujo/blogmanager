@@ -117,6 +117,7 @@
 			textField_2.setColumns(10);
 	
 			addCatBtn = new JButton("Add Category");
+			addCatBtn.setEnabled(false);
 			GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 			gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
 			gbc_btnNewButton.gridx = 1;
@@ -124,6 +125,7 @@
 			contentPane.add(addCatBtn, gbc_btnNewButton);
 	
 			clearBtn = new JButton("Clear");
+			clearBtn.setEnabled(false);
 			GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
 			gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 5);
 			gbc_btnNewButton_3.gridx = 2;
@@ -145,6 +147,7 @@
 			scrollPane.setColumnHeaderView(list);
 	
 			updateBtn = new JButton("Update");
+			updateBtn.setEnabled(false);
 			GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
 			gbc_btnNewButton_1.fill = GridBagConstraints.BOTH;
 			gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 5);
@@ -153,6 +156,7 @@
 			contentPane.add(updateBtn, gbc_btnNewButton_1);
 	
 			deleteBtn = new JButton("Delete");
+			deleteBtn.setEnabled(false);
 			GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
 			gbc_btnNewButton_2.fill = GridBagConstraints.BOTH;
 			gbc_btnNewButton_2.insets = new Insets(0, 0, 5, 5);
