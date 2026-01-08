@@ -15,7 +15,7 @@ public class CategoryRepositoryTest {
 
 	@Before
 	public void setUp() {
-		// Mocking the CategoryRepository interface
+
 		categoryRepository = mock(CategoryRepository.class);
 	}
 

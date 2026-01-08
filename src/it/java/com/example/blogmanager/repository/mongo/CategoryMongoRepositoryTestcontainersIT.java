@@ -32,13 +32,13 @@ public class CategoryMongoRepositoryTestcontainersIT {
 
 	@BeforeClass
 	public static void setupServer() {
-		// Start the MongoDB container
+
 		mongo.start();
 	}
 
 	@AfterClass
 	public static void shutdownServer() {
-		// Stop the MongoDB container
+
 		mongo.stop();
 	}
 

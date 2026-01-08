@@ -61,7 +61,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 					bp.getCategory().getName());
 			update.append("category", catDoc);
 		} else {
-			// if you want to clear category on null
+
 			update.append("category", null);
 		}
 
@@ -81,7 +81,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 
 	private BlogPost documentToBlogPost(Document d) {
 		String id = d.getString("id");
-		String title = d.getString("title");	
+		String title = d.getString("title");
 		String content = d.getString("content");
 		String author = d.getString("author");
 		String creationDate = d.getString("creationDate");

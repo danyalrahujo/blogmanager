@@ -1,7 +1,8 @@
 package com.example.blogmanager.controller;
 
-import static org.mockito.Mockito.verify;
 import static java.util.Arrays.asList;
+import static org.mockito.Mockito.verify;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,8 @@ import com.example.blogmanager.repository.mongo.CategoryMongoRepository;
 import com.example.blogmanager.view.CategoryView;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+
+//docker run -p 27017:27017 --rm mongo:4.4.3
 
 public class CategoryControllerIT {
 
@@ -32,7 +35,7 @@ public class CategoryControllerIT {
 	public void setUp() {
 		closeable = MockitoAnnotations.openMocks(this);
 		categoryRepository = new CategoryMongoRepository(new MongoClient(new ServerAddress("localhost", mongoPort)));
-		// Explicitly clean the database through the repository
+
 		for (Category category : categoryRepository.findAll()) {
 			categoryRepository.delete(category.getId());
 		}

@@ -14,27 +14,36 @@ import org.junit.Test;
 import org.testcontainers.containers.MongoDBContainer;
 
 import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.model.Category;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class BlogPostMongoRepositoryTestcontainersIT {
+
 	@ClassRule
 	public static final MongoDBContainer mongo = new MongoDBContainer("mongo:4.4.3");
 
 	private MongoClient client;
 	private BlogPostMongoRepository blogPostRepository;
+	private CategoryMongoRepository categoryRepository;
 	private MongoCollection<Document> blogPostCollection;
 
 	@Before
 	public void setup() {
 		client = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
 		blogPostRepository = new BlogPostMongoRepository(client);
-		MongoDatabase database = client.getDatabase(BlogPostMongoRepository.BLOG_DB_NAME);
+		categoryRepository = new CategoryMongoRepository(client);
 
+		MongoDatabase database = client.getDatabase(BlogPostMongoRepository.BLOG_DB_NAME);
 		database.drop();
+
 		blogPostCollection = database.getCollection(BlogPostMongoRepository.BLOG_COLLECTION_NAME);
+		database.getCollection(CategoryMongoRepository.CATEGORY_COLLECTION_NAME);
+
+		categoryRepository.save(new Category("cat1", "Tech"));
+		categoryRepository.save(new Category("cat2", "News"));
 	}
 
 	@After
@@ -44,26 +53,30 @@ public class BlogPostMongoRepositoryTestcontainersIT {
 
 	@Test
 	public void testFindAll() {
-		addTestBlogPostToDatabase("1", "Hello", "First post", "cat1");
-		addTestBlogPostToDatabase("2", "Goodbye", "Second post", "cat2");
+		Category cat1 = categoryRepository.findById("cat1");
+		Category cat2 = categoryRepository.findById("cat2");
+
+		addTestBlogPostToDatabase("1", "Hello", "First post", "AuthorA", cat1);
+		addTestBlogPostToDatabase("2", "Goodbye", "Second post", "AuthorB", cat2);
 
 		assertThat(blogPostRepository.findAll()).containsExactly(
-				new BlogPost("1", "Hello", "First post", "cat1", null, null),
-				new BlogPost("2", "Goodbye", "Second post", "cat2", null, null));
+				new BlogPost("1", "Hello", "First post", "AuthorA", null, cat1),
+				new BlogPost("2", "Goodbye", "Second post", "AuthorB", null, cat2));
 	}
 
 	@Test
 	public void testFindById() {
-		addTestBlogPostToDatabase("1", "Hello", "First post", "cat1");
-		addTestBlogPostToDatabase("2", "Goodbye", "Second post", "cat2");
+		Category cat2 = categoryRepository.findById("cat2");
+		addTestBlogPostToDatabase("2", "Goodbye", "Second post", "AuthorB", cat2);
 
 		assertThat(blogPostRepository.findById("2"))
-				.isEqualTo(new BlogPost("2", "Goodbye", "Second post", "cat2", null, null));
+				.isEqualTo(new BlogPost("2", "Goodbye", "Second post", "AuthorB", null, cat2));
 	}
 
 	@Test
 	public void testSave() {
-		BlogPost blogPost = new BlogPost("1", "Hello", "First post", "cat1", null, null);
+		Category cat1 = categoryRepository.findById("cat1");
+		BlogPost blogPost = new BlogPost("1", "Hello", "First post", "AuthorA", null, cat1);
 		blogPostRepository.save(blogPost);
 
 		assertThat(readAllBlogPostsFromDatabase()).containsExactly(blogPost);
@@ -71,39 +84,36 @@ public class BlogPostMongoRepositoryTestcontainersIT {
 
 	@Test
 	public void testDelete() {
-		addTestBlogPostToDatabase("1", "Hello", "First post", "cat1");
+		Category cat1 = categoryRepository.findById("cat1");
+		addTestBlogPostToDatabase("1", "Hello", "First post", "AuthorA", cat1);
 		blogPostRepository.delete("1");
-
 		assertThat(readAllBlogPostsFromDatabase()).isEmpty();
 	}
 
 	@Test
 	public void testUpdate() {
-		BlogPost originalBlogPost = new BlogPost("1", "Hello", "First post", "cat1", null, null);
-		blogPostRepository.save(originalBlogPost);
+		Category cat1 = categoryRepository.findById("cat1");
+		BlogPost original = new BlogPost("1", "Hello", "First post", "AuthorA", null, cat1);
+		blogPostRepository.save(original);
 
-		assertThat(readAllBlogPostsFromDatabase()).containsExactly(originalBlogPost);
+		BlogPost updated = new BlogPost("1", "Updated", "Updated post", "AuthorA", null, cat1);
+		blogPostRepository.update(updated);
 
-		BlogPost updatedBlogPost = new BlogPost("1", "Updated", "Updated post", "cat1", null, null);
-		blogPostRepository.update(updatedBlogPost);
-
-		assertThat(readAllBlogPostsFromDatabase()).containsExactly(updatedBlogPost);
+		assertThat(readAllBlogPostsFromDatabase()).containsExactly(updated);
 	}
 
-	// Helpers
-
-	private void addTestBlogPostToDatabase(String id, String title, String content, String author) {
+	private void addTestBlogPostToDatabase(String id, String title, String content, String author, Category category) {
+		Document catDoc = new Document().append("id", category.getId()).append("name", category.getName());
 		blogPostCollection.insertOne(new Document().append("id", id).append("title", title).append("content", content)
-				.append("author", author)
-		// omit creationDate & category so they remain null in the mapped object
-		);
+				.append("author", author).append("category", catDoc));
 	}
 
 	private List<BlogPost> readAllBlogPostsFromDatabase() {
-		return StreamSupport.stream(blogPostCollection.find().spliterator(), false)
-				.map(d -> new BlogPost("" + d.get("id"), "" + d.get("title"), "" + d.get("content"),
-						"" + d.get("author"), (String) d.get("creationDate"), // cast to string
-						null // category is omitted in this test, could be populated
-				)).collect(Collectors.toList());
+		return StreamSupport.stream(blogPostCollection.find().spliterator(), false).map(d -> {
+			Document catDoc = d.get("category", Document.class);
+			Category category = catDoc != null ? new Category(catDoc.getString("id"), catDoc.getString("name")) : null;
+			return new BlogPost(d.getString("id"), d.getString("title"), d.getString("content"), d.getString("author"),
+					d.getString("creationDate"), category);
+		}).collect(Collectors.toList());
 	}
 }

@@ -3,7 +3,6 @@ package com.example.blogmanager.controller;
 import com.example.blogmanager.repository.CategoryRepository;
 import com.example.blogmanager.view.CategoryView;
 
-
 import com.example.blogmanager.model.Category;
 
 public class CategoryController {
