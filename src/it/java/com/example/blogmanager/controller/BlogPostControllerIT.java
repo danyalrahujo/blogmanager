@@ -2,6 +2,7 @@ package com.example.blogmanager.controller;
 
 import static org.mockito.Mockito.verify;
 import static java.util.Arrays.asList;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,8 +10,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.BlogPostRepository;
+import com.example.blogmanager.repository.CategoryRepository;
 import com.example.blogmanager.repository.mongo.BlogPostMongoRepository;
+import com.example.blogmanager.repository.mongo.CategoryMongoRepository;
 import com.example.blogmanager.view.BlogPostView;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
@@ -21,7 +25,7 @@ public class BlogPostControllerIT {
 	private BlogPostView blogPostView;
 
 	private BlogPostRepository blogPostRepository;
-
+	private CategoryRepository categoryRepository;
 	private BlogPostController blogPostController;
 
 	private AutoCloseable closeable;
@@ -31,11 +35,19 @@ public class BlogPostControllerIT {
 	@Before
 	public void setUp() {
 		closeable = MockitoAnnotations.openMocks(this);
-		blogPostRepository = new BlogPostMongoRepository(new MongoClient(new ServerAddress("localhost", mongoPort)));
-		// explicit empty the database through the repository
+
+		MongoClient client = new MongoClient(new ServerAddress("localhost", mongoPort));
+		blogPostRepository = new BlogPostMongoRepository(client);
+		categoryRepository = new CategoryMongoRepository(client);
+
 		for (BlogPost blogPost : blogPostRepository.findAll()) {
 			blogPostRepository.delete(blogPost.getId());
 		}
+		for (Category category : categoryRepository.findAll()) {
+			categoryRepository.delete(category.getId());
+		}
+
+		categoryRepository.save(new Category("cat1", "Tech"));
 		blogPostController = new BlogPostController(blogPostView, blogPostRepository);
 	}
 
@@ -46,7 +58,8 @@ public class BlogPostControllerIT {
 
 	@Test
 	public void testAllBlogPosts() {
-		BlogPost blogPost = new BlogPost("1", "Hello", "First post", "cat1", "2025-04-01", null);
+		Category category = categoryRepository.findById("cat1");
+		BlogPost blogPost = new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", category);
 		blogPostRepository.save(blogPost);
 		blogPostController.getAllBlogPosts();
 		verify(blogPostView).displayBlogPosts(asList(blogPost));
@@ -54,14 +67,16 @@ public class BlogPostControllerIT {
 
 	@Test
 	public void testNewBlogPost() {
-		BlogPost blogPost = new BlogPost("1", "Hello", "First post", "cat1", "2025-04-01", null);
+		Category category = categoryRepository.findById("cat1");
+		BlogPost blogPost = new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", category);
 		blogPostController.addBlogPost(blogPost);
 		verify(blogPostView).addBlogPost(blogPost);
 	}
 
 	@Test
 	public void testDeleteBlogPost() {
-		BlogPost blogPostToDelete = new BlogPost("1", "Hello", "First post", "cat1", "2025-04-01", null);
+		Category category = categoryRepository.findById("cat1");
+		BlogPost blogPostToDelete = new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", category);
 		blogPostRepository.save(blogPostToDelete);
 		blogPostController.deleteBlogPost(blogPostToDelete);
 		verify(blogPostView).deleteBlogPost(blogPostToDelete);
@@ -69,13 +84,12 @@ public class BlogPostControllerIT {
 
 	@Test
 	public void testUpdateBlogPost() {
-		BlogPost originalBlogPost = new BlogPost("1", "Hello", "First post", "cat1", "2025-04-01", null);
-		blogPostRepository.save(originalBlogPost);
+		Category category = categoryRepository.findById("cat1");
+		BlogPost original = new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", category);
+		blogPostRepository.save(original);
 
-		BlogPost updatedBlogPost = new BlogPost("1", "Hello", "Updated post", "cat1", "2025-05-01", null);
-		blogPostController.updateBlogPost(updatedBlogPost);
-
-		verify(blogPostView).updateBlogPost(updatedBlogPost);
+		BlogPost updated = new BlogPost("1", "Hello", "Updated post", "Author", "2025-05-01", category);
+		blogPostController.updateBlogPost(updated);
+		verify(blogPostView).updateBlogPost(updated);
 	}
-
 }

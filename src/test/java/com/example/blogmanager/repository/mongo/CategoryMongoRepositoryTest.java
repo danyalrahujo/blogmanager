@@ -25,7 +25,7 @@ import com.mongodb.client.MongoDatabase;
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
-public class CategoryRepositoryTest {
+public class CategoryMongoRepositoryTest {
 
 	private static MongoServer server;
 	private static InetSocketAddress serverAddress;
