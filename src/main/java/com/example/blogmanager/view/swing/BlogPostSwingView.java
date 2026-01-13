@@ -1,22 +1,32 @@
 package com.example.blogmanager.view.swing;
 
+import java.awt.Component;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.JButton;
-import javax.swing.JList;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.ListSelectionModel;
-import javax.swing.JScrollPane;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
+
+import com.example.blogmanager.controller.BlogPostController;
+import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.model.Category;
 
 public class BlogPostSwingView extends JFrame {
 
@@ -36,10 +46,16 @@ public class BlogPostSwingView extends JFrame {
 	private JButton updateBtn;
 	private JButton deleteBtn;
 	private JButton clearBtn;
-	private JList list_1;
+	private JList<BlogPost> list_1;
 	private JScrollPane scrollPane;
-	private JComboBox categryBox;
+	private JComboBox<Category> categryBox;
 	private JLabel errorMsg;
+
+	private DefaultComboBoxModel<Category> comboBoxCategoriesModel;
+
+	private BlogPostController blogPostController;
+
+	private DefaultListModel<BlogPost> listBlogPostModel;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -54,7 +70,17 @@ public class BlogPostSwingView extends JFrame {
 		});
 	}
 
+	public void setBlogPostController(BlogPostController blogPostController) {
+		this.blogPostController = blogPostController;
+
+	}
+
+	DefaultListModel<BlogPost> getListBlogPostModel() {
+		return listBlogPostModel;
+	}
+
 	public BlogPostSwingView() {
+
 		setTitle("BlogPost View");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 620, 525);
@@ -88,6 +114,11 @@ public class BlogPostSwingView extends JFrame {
 		gbc_textField.gridy = 0;
 		contentPane.add(BlogPostTxtId, gbc_textField);
 		BlogPostTxtId.setColumns(10);
+		BlogPostTxtId.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent e) {
+				updateCreateButtonState();
+			}
+		});
 
 		JLabel lblNewLabel_1 = new JLabel("title");
 		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
@@ -107,6 +138,11 @@ public class BlogPostSwingView extends JFrame {
 		gbc_textField_1.gridy = 1;
 		contentPane.add(BlogPostTxtTitle, gbc_textField_1);
 		BlogPostTxtTitle.setColumns(10);
+		BlogPostTxtTitle.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent e) {
+				updateCreateButtonState();
+			}
+		});
 
 		lblNewLabel_2 = new JLabel("author");
 		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
@@ -126,6 +162,11 @@ public class BlogPostSwingView extends JFrame {
 		gbc_textField_2.gridy = 2;
 		contentPane.add(BlogPostTxtAuthor, gbc_textField_2);
 		BlogPostTxtAuthor.setColumns(10);
+		BlogPostTxtAuthor.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent e) {
+				updateCreateButtonState();
+			}
+		});
 
 		lblNewLabel_3 = new JLabel("content");
 		GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
@@ -145,6 +186,11 @@ public class BlogPostSwingView extends JFrame {
 		gbc_textField_3.gridy = 3;
 		contentPane.add(BlogPostTxtContent, gbc_textField_3);
 		BlogPostTxtContent.setColumns(10);
+		BlogPostTxtContent.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent e) {
+				updateCreateButtonState();
+			}
+		});
 
 		lblNewLabel_4 = new JLabel("category");
 		GridBagConstraints gbc_lblNewLabel_4 = new GridBagConstraints();
@@ -154,7 +200,10 @@ public class BlogPostSwingView extends JFrame {
 		gbc_lblNewLabel_4.gridy = 4;
 		contentPane.add(lblNewLabel_4, gbc_lblNewLabel_4);
 
-		categryBox = new JComboBox();
+		categryBox = new JComboBox<Category>();
+		comboBoxCategoriesModel = new DefaultComboBoxModel<>();
+		categryBox.setModel(comboBoxCategoriesModel);
+		categryBox.setName("BlogPostCategoryComboBox");
 		GridBagConstraints gbc_comboBox = new GridBagConstraints();
 		gbc_comboBox.gridwidth = 3;
 		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
@@ -162,6 +211,22 @@ public class BlogPostSwingView extends JFrame {
 		gbc_comboBox.gridx = 1;
 		gbc_comboBox.gridy = 4;
 		contentPane.add(categryBox, gbc_comboBox);
+		categryBox.addActionListener(e -> updateCreateButtonState());
+		categryBox.setRenderer(new DefaultListCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof Category) {
+					Category category = (Category) value;
+					setText(category.getName());
+				}
+				return this;
+			}
+		});
 
 		lblNewLabel_5 = new JLabel("creationDate");
 		GridBagConstraints gbc_lblNewLabel_5 = new GridBagConstraints();
@@ -181,6 +246,11 @@ public class BlogPostSwingView extends JFrame {
 		gbc_textField_5.gridy = 5;
 		contentPane.add(BlogPostTxtCreationDate, gbc_textField_5);
 		BlogPostTxtCreationDate.setColumns(10);
+		BlogPostTxtCreationDate.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent e) {
+				updateCreateButtonState();
+			}
+		});
 
 		createBtn = new JButton("Create");
 		createBtn.setEnabled(false);
@@ -190,19 +260,36 @@ public class BlogPostSwingView extends JFrame {
 		gbc_btnNewButton_1.gridx = 0;
 		gbc_btnNewButton_1.gridy = 6;
 		contentPane.add(createBtn, gbc_btnNewButton_1);
+		createBtn.addActionListener(e -> {
+			BlogPost post = new BlogPost(BlogPostTxtId.getText(), BlogPostTxtTitle.getText(),
+					BlogPostTxtContent.getText(), BlogPostTxtAuthor.getText(), BlogPostTxtCreationDate.getText(),
+					(Category) categryBox.getSelectedItem());
+			blogPostController.addBlogPost(post);
+		});
 
 		clearBtn = new JButton("Clear");
 		clearBtn.setEnabled(false);
-		clearBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
 		gbc_btnNewButton_4.anchor = GridBagConstraints.NORTHWEST;
 		gbc_btnNewButton_4.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton_4.gridx = 1;
 		gbc_btnNewButton_4.gridy = 6;
 		contentPane.add(clearBtn, gbc_btnNewButton_4);
+		clearBtn.addActionListener(e -> {
+			BlogPostTxtId.setText("");
+			BlogPostTxtTitle.setText("");
+			BlogPostTxtAuthor.setText("");
+			BlogPostTxtContent.setText("");
+			BlogPostTxtCreationDate.setText("");
+			categryBox.setSelectedItem(null);
+
+			updateBtn.setEnabled(false);
+			deleteBtn.setEnabled(false);
+
+			list_1.clearSelection();
+			resetErrorLabel();
+			BlogPostTxtId.setEnabled(true);
+		});
 
 		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -213,20 +300,75 @@ public class BlogPostSwingView extends JFrame {
 		gbc_scrollPane.gridy = 7;
 		contentPane.add(scrollPane, gbc_scrollPane);
 
-		list_1 = new JList();
+		listBlogPostModel = new DefaultListModel<>();
+		list_1 = new JList<>(listBlogPostModel);
 		scrollPane.setViewportView(list_1);
 		list_1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list_1.setName("BlogPostList");
+		list_1.addListSelectionListener(e -> {
+			boolean selected = list_1.getSelectedIndex() != -1;
+			updateBtn.setEnabled(selected);
+			deleteBtn.setEnabled(selected);
+			clearBtn.setEnabled(selected);
+
+			if (selected) {
+				BlogPost post = list_1.getSelectedValue();
+				BlogPostTxtId.setText(post.getId());
+				BlogPostTxtTitle.setText(post.getTitle());
+				BlogPostTxtAuthor.setText(post.getAuthor());
+				BlogPostTxtContent.setText(post.getContent());
+				BlogPostTxtCreationDate.setText(post.getCreationDate());
+
+				Category postCategory = post.getCategory();
+				if (postCategory != null) {
+					ensureCategoryExists(postCategory);
+					categryBox.setSelectedItem(postCategory);
+				}
+
+				BlogPostTxtId.setEnabled(false);
+				createBtn.setEnabled(false);
+			} else {
+				BlogPostTxtId.setText("");
+				BlogPostTxtTitle.setText("");
+				BlogPostTxtAuthor.setText("");
+				BlogPostTxtContent.setText("");
+				BlogPostTxtCreationDate.setText("");
+
+				BlogPostTxtId.setEnabled(true);
+
+			}
+		});
+		list_1.setCellRenderer(new DefaultListCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof BlogPost) {
+					BlogPost blogPost = (BlogPost) value;
+					setText(getDisplayString(blogPost));
+				}
+				return this;
+			}
+		});
 
 		deleteBtn = new JButton("Delete");
 		deleteBtn.setEnabled(false);
-		deleteBtn.setName("");
+		deleteBtn.setName("deleteBtn");
 		GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
 		gbc_btnNewButton_3.anchor = GridBagConstraints.WEST;
 		gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton_3.gridx = 0;
 		gbc_btnNewButton_3.gridy = 8;
 		contentPane.add(deleteBtn, gbc_btnNewButton_3);
+		deleteBtn.addActionListener(e -> {
+			BlogPost selected = list_1.getSelectedValue();
+			if (selected != null) {
+				blogPostController.deleteBlogPost(selected);
+			}
+		});
 
 		updateBtn = new JButton("Update");
 		updateBtn.setEnabled(false);
@@ -237,6 +379,15 @@ public class BlogPostSwingView extends JFrame {
 		gbc_btnNewButton_2.gridx = 1;
 		gbc_btnNewButton_2.gridy = 8;
 		contentPane.add(updateBtn, gbc_btnNewButton_2);
+		updateBtn.addActionListener(e -> {
+			BlogPost selected = list_1.getSelectedValue();
+			if (selected == null)
+				return;
+			BlogPost updated = new BlogPost(selected.getId(), BlogPostTxtTitle.getText(), BlogPostTxtContent.getText(),
+					BlogPostTxtAuthor.getText(), BlogPostTxtCreationDate.getText(),
+					(Category) categryBox.getSelectedItem());
+			blogPostController.updateBlogPost(updated);
+		});
 
 		btnNewButton = new JButton("Category");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -263,4 +414,73 @@ public class BlogPostSwingView extends JFrame {
 
 	}
 
+	private void updateCreateButtonState() {
+		boolean enabled = !BlogPostTxtId.getText().trim().isEmpty() && !BlogPostTxtTitle.getText().trim().isEmpty()
+				&& !BlogPostTxtAuthor.getText().trim().isEmpty() && !BlogPostTxtContent.getText().trim().isEmpty()
+				&& !BlogPostTxtCreationDate.getText().trim().isEmpty() && categryBox.getSelectedItem() != null;
+		createBtn.setEnabled(enabled);
+		clearBtn.setEnabled(enabled);
+	}
+
+	public void showErrorMessage(String message, BlogPost blogPost) {
+		errorMsg.setText(message + ": " + blogPost);
+	}
+
+	public void updateCategories(List<Category> categories) {
+		comboBoxCategoriesModel.removeAllElements();
+		for (Category c : categories) {
+			comboBoxCategoriesModel.addElement(c);
+		}
+
+		updateCreateButtonState();
+	}
+
+	public void blogPostAdded(BlogPost post) {
+		javax.swing.SwingUtilities.invokeLater(() -> {
+			listBlogPostModel.addElement(post);
+			resetErrorLabel();
+		});
+	}
+
+	private void ensureCategoryExists(Category category) {
+		for (int i = 0; i < comboBoxCategoriesModel.getSize(); i++) {
+			if (comboBoxCategoriesModel.getElementAt(i).equals(category)) {
+				return;
+			}
+		}
+		comboBoxCategoriesModel.addElement(category);
+	}
+
+	DefaultComboBoxModel<Category> getComboCategoriesModel() {
+		return comboBoxCategoriesModel;
+	}
+
+	private String getDisplayString(BlogPost blogPost) {
+		return blogPost.getId() + " - " + blogPost.getTitle() + " - " + blogPost.getAuthor() + " - "
+				+ blogPost.getCreationDate() + " - " + blogPost.getContent() + " - "
+				+ (blogPost.getCategory() != null ? blogPost.getCategory().getName() : "");
+	}
+
+	public void blogPostDeleted(BlogPost post) {
+		SwingUtilities.invokeLater(() -> {
+			listBlogPostModel.removeElement(post);
+			resetErrorLabel();
+		});
+	}
+
+	public void blogPostUpdated(BlogPost newPost) {
+		SwingUtilities.invokeLater(() -> {
+			for (int i = 0; i < listBlogPostModel.size(); i++) {
+				if (listBlogPostModel.get(i).getId().equals(newPost.getId())) {
+					listBlogPostModel.set(i, newPost);
+					break;
+				}
+			}
+			resetErrorLabel();
+		});
+	}
+
+	private void resetErrorLabel() {
+		errorMsg.setText("");
+	}
 }

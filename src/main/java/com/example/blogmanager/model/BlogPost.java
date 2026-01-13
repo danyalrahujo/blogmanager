@@ -1,5 +1,7 @@
 package com.example.blogmanager.model;
 
+import java.util.Objects;
+
 public class BlogPost {
 	private String id;
 	private String title;
@@ -79,18 +81,19 @@ public class BlogPost {
 
 		BlogPost blogPost = (BlogPost) o;
 
-		return id != null ? id.equals(blogPost.id) : blogPost.id == null;
+		return Objects.equals(id, blogPost.id) && Objects.equals(title, blogPost.title)
+				&& Objects.equals(content, blogPost.content) && Objects.equals(author, blogPost.author)
+				&& Objects.equals(creationDate, blogPost.creationDate) && Objects.equals(category, blogPost.category);
 	}
 
 	@Override
 	public int hashCode() {
-		return id != null ? id.hashCode() : 0;
+		return Objects.hash(id, title, content, author, creationDate, category);
 	}
 
 	@Override
 	public String toString() {
-		return "BlogPost{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", content='" + content + '\''
-				+ ", author='" + author + '\'' + ", creationDate='" + creationDate + '\'' + ", category=" + category
-				+ '}';
+		return id + " - " + title + " - " + author + " - " + creationDate + " - " + content + " - " + category;
 	}
+
 }
