@@ -159,7 +159,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 	public void testBlogPostAddedShouldAddPostToListAndResetErrorLabel() {
 		BlogPost post = new BlogPost("1", "Title", "Content", "Author", DATE, new Category("1", "Tech"));
 
-		blogPostSwingView.blogPostAdded(post);
+		blogPostSwingView.addBlogPost(post);
 
 		assertThat(window.list("BlogPostList").contents()).containsExactly(getDisplayString(post));
 
@@ -300,7 +300,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("BlogPostList").selectItem(0);
 
-		GuiActionRunner.execute(() -> blogPostSwingView.blogPostUpdated(newPost));
+		GuiActionRunner.execute(() -> blogPostSwingView.updateBlogPost(newPost));
 
 		String[] listContents = window.list().contents();
 		assertThat(listContents).containsExactly(getDisplayString(newPost));
@@ -322,7 +322,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("BlogPostList").selectItem(0);
 
-		GuiActionRunner.execute(() -> blogPostSwingView.blogPostDeleted(post));
+		GuiActionRunner.execute(() -> blogPostSwingView.deleteBlogPost(post));
 
 		window.list("BlogPostList").requireItemCount(0);
 	}
@@ -343,7 +343,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("BlogPostList").selectItem(0);
 
-		GuiActionRunner.execute(() -> blogPostSwingView.blogPostDeleted(post));
+		GuiActionRunner.execute(() -> blogPostSwingView.deleteBlogPost(post));
 
 		window.list("BlogPostList").requireItemCount(0);
 		window.button(JButtonMatcher.withText("Update")).requireDisabled();
@@ -390,7 +390,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("BlogPostList").selectItem(0);
 
-		GuiActionRunner.execute(() -> blogPostSwingView.blogPostDeleted(post));
+		GuiActionRunner.execute(() -> blogPostSwingView.deleteBlogPost(post));
 
 		window.button(JButtonMatcher.withText("Update")).requireDisabled();
 		window.button(JButtonMatcher.withText("Delete")).requireDisabled();

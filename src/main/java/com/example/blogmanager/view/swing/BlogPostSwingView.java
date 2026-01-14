@@ -27,8 +27,9 @@ import javax.swing.border.EmptyBorder;
 import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.model.BlogPost;
 import com.example.blogmanager.model.Category;
+import com.example.blogmanager.view.BlogPostView;
 
-public class BlogPostSwingView extends JFrame {
+public class BlogPostSwingView extends JFrame implements BlogPostView {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -435,13 +436,6 @@ public class BlogPostSwingView extends JFrame {
 		updateCreateButtonState();
 	}
 
-	public void blogPostAdded(BlogPost post) {
-		javax.swing.SwingUtilities.invokeLater(() -> {
-			listBlogPostModel.addElement(post);
-			resetErrorLabel();
-		});
-	}
-
 	private void ensureCategoryExists(Category category) {
 		for (int i = 0; i < comboBoxCategoriesModel.getSize(); i++) {
 			if (comboBoxCategoriesModel.getElementAt(i).equals(category)) {
@@ -461,14 +455,33 @@ public class BlogPostSwingView extends JFrame {
 				+ (blogPost.getCategory() != null ? blogPost.getCategory().getName() : "");
 	}
 
-	public void blogPostDeleted(BlogPost post) {
-		SwingUtilities.invokeLater(() -> {
-			listBlogPostModel.removeElement(post);
+	private void resetErrorLabel() {
+		errorMsg.setText("");
+	}
+
+	@Override
+	public void displayBlogPosts(List<BlogPost> blogPosts) {
+		blogPosts.stream().forEach(listBlogPostModel::addElement);
+	}
+
+	@Override
+	public void addBlogPost(BlogPost blogPost) {
+		javax.swing.SwingUtilities.invokeLater(() -> {
+			listBlogPostModel.addElement(blogPost);
 			resetErrorLabel();
 		});
 	}
 
-	public void blogPostUpdated(BlogPost newPost) {
+	@Override
+	public void deleteBlogPost(BlogPost blogPost) {
+		SwingUtilities.invokeLater(() -> {
+			listBlogPostModel.removeElement(blogPost);
+			resetErrorLabel();
+		});
+	}
+
+	@Override
+	public void updateBlogPost(BlogPost newPost) {
 		SwingUtilities.invokeLater(() -> {
 			for (int i = 0; i < listBlogPostModel.size(); i++) {
 				if (listBlogPostModel.get(i).getId().equals(newPost.getId())) {
@@ -478,9 +491,5 @@ public class BlogPostSwingView extends JFrame {
 			}
 			resetErrorLabel();
 		});
-	}
-
-	private void resetErrorLabel() {
-		errorMsg.setText("");
 	}
 }

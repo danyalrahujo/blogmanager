@@ -97,7 +97,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	public void testCategoryAddedShouldAddCategoryToListAndResetErrorLabel() {
 		Category category = new Category("1", "Tech");
 
-		categorySwingView.categoryAdded(category);
+		categorySwingView.addCategory(category);
 
 		assertThat(window.list("CategoryList").contents()).containsExactly(getDisplayString(category));
 
@@ -184,7 +184,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.list("CategoryList").selectItem(0);
 		window.textBox("CategoryNameTextBox").setText("New");
 
-		GuiActionRunner.execute(() -> categorySwingView.categoryUpdated(new Category("1", "New")));
+		GuiActionRunner.execute(() -> categorySwingView.updateCategory(new Category("1", "New")));
 
 		window.list("CategoryList").requireSelection("1 - New");
 	}
@@ -204,7 +204,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("CategoryList").selectItem(0);
 
-		GuiActionRunner.execute(() -> categorySwingView.categoryDeleted(category));
+		GuiActionRunner.execute(() -> categorySwingView.deleteCategory(category));
 
 		window.list("CategoryList").requireItemCount(0);
 	}
@@ -224,7 +224,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("CategoryList").selectItem(0);
 
-		GuiActionRunner.execute(() -> categorySwingView.categoryDeleted(category));
+		GuiActionRunner.execute(() -> categorySwingView.deleteCategory(category));
 
 		window.list("CategoryList").requireItemCount(0);
 		window.button(JButtonMatcher.withText("Update")).requireDisabled();
@@ -268,7 +268,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.list("CategoryList").selectItem(0);
 
-		GuiActionRunner.execute(() -> categorySwingView.categoryDeleted(category));
+		GuiActionRunner.execute(() -> categorySwingView.deleteCategory(category));
 
 		window.button(JButtonMatcher.withText("Update")).requireDisabled();
 		window.button(JButtonMatcher.withText("Delete")).requireDisabled();

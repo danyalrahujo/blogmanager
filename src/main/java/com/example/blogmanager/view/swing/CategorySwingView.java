@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -21,8 +22,9 @@ import javax.swing.border.EmptyBorder;
 
 import com.example.blogmanager.controller.CategoryController;
 import com.example.blogmanager.model.Category;
+import com.example.blogmanager.view.CategoryView;
 
-public class CategorySwingView extends JFrame {
+public class CategorySwingView extends JFrame implements CategoryView {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -268,30 +270,37 @@ public class CategorySwingView extends JFrame {
 		errorMsg.setText(message + ": " + category);
 	}
 
-	public void categoryAdded(Category category) {
-		javax.swing.SwingUtilities.invokeLater(() -> {
-			listCategoryModel.addElement(category);
-			errorMsg.setText("");
-		});
-
-	}
-
 	private String getDisplayString(Category category) {
 		return category.getId() + " - " + category.getName();
-	}
-
-	public void categoryDeleted(Category category) {
-		SwingUtilities.invokeLater(() -> {
-			listCategoryModel.removeElement(category);
-			resetErrorLabel();
-		});
 	}
 
 	private void resetErrorLabel() {
 		errorMsg.setText("");
 	}
 
-	public void categoryUpdated(Category category) {
+	@Override
+	public void displayCategories(List<Category> categories) {
+		categories.stream().forEach(listCategoryModel::addElement);
+	}
+
+	@Override
+	public void addCategory(Category category) {
+		javax.swing.SwingUtilities.invokeLater(() -> {
+			listCategoryModel.addElement(category);
+			errorMsg.setText("");
+		});
+	}
+
+	@Override
+	public void deleteCategory(Category category) {
+		SwingUtilities.invokeLater(() -> {
+			listCategoryModel.removeElement(category);
+			resetErrorLabel();
+		});
+	}
+
+	@Override
+	public void updateCategory(Category category) {
 		SwingUtilities.invokeLater(() -> {
 			for (int i = 0; i < listCategoryModel.size(); i++) {
 				if (listCategoryModel.get(i).getId().equals(category.getId())) {
