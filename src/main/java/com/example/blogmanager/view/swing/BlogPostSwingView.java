@@ -265,7 +265,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 			BlogPost post = new BlogPost(BlogPostTxtId.getText(), BlogPostTxtTitle.getText(),
 					BlogPostTxtContent.getText(), BlogPostTxtAuthor.getText(), BlogPostTxtCreationDate.getText(),
 					(Category) categryBox.getSelectedItem());
-			blogPostController.addBlogPost(post);
+			new Thread(() -> blogPostController.addBlogPost(post)).start();
 		});
 
 		clearBtn = new JButton("Clear");
@@ -367,7 +367,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		deleteBtn.addActionListener(e -> {
 			BlogPost selected = list_1.getSelectedValue();
 			if (selected != null) {
-				blogPostController.deleteBlogPost(selected);
+				new Thread(() -> blogPostController.deleteBlogPost(selected)).start();
 			}
 		});
 
@@ -387,7 +387,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 			BlogPost updated = new BlogPost(selected.getId(), BlogPostTxtTitle.getText(), BlogPostTxtContent.getText(),
 					BlogPostTxtAuthor.getText(), BlogPostTxtCreationDate.getText(),
 					(Category) categryBox.getSelectedItem());
-			blogPostController.updateBlogPost(updated);
+			new Thread(() -> blogPostController.updateBlogPost(updated)).start();
 		});
 
 		btnNewButton = new JButton("Category");
@@ -424,25 +424,28 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 	}
 
 	public void showErrorMessage(String message, BlogPost blogPost) {
-		errorMsg.setText(message + ": " + blogPost);
+		SwingUtilities.invokeLater(() -> errorMsg.setText(message + ": " + blogPost));
 	}
 
 	public void updateCategories(List<Category> categories) {
-		comboBoxCategoriesModel.removeAllElements();
-		for (Category c : categories) {
-			comboBoxCategoriesModel.addElement(c);
-		}
-
-		updateCreateButtonState();
+		SwingUtilities.invokeLater(() -> {
+			comboBoxCategoriesModel.removeAllElements();
+			for (Category c : categories) {
+				comboBoxCategoriesModel.addElement(c);
+			}
+			updateCreateButtonState();
+		});
 	}
 
 	private void ensureCategoryExists(Category category) {
-		for (int i = 0; i < comboBoxCategoriesModel.getSize(); i++) {
-			if (comboBoxCategoriesModel.getElementAt(i).equals(category)) {
-				return;
+		SwingUtilities.invokeLater(() -> {
+			for (int i = 0; i < comboBoxCategoriesModel.getSize(); i++) {
+				if (comboBoxCategoriesModel.getElementAt(i).equals(category)) {
+					return;
+				}
 			}
-		}
-		comboBoxCategoriesModel.addElement(category);
+			comboBoxCategoriesModel.addElement(category);
+		});
 	}
 
 	DefaultComboBoxModel<Category> getComboCategoriesModel() {
@@ -456,12 +459,15 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 	}
 
 	private void resetErrorLabel() {
-		errorMsg.setText("");
+		SwingUtilities.invokeLater(() -> errorMsg.setText(""));
 	}
 
 	@Override
 	public void displayBlogPosts(List<BlogPost> blogPosts) {
-		blogPosts.stream().forEach(listBlogPostModel::addElement);
+		SwingUtilities.invokeLater(() -> {
+			listBlogPostModel.clear();
+			blogPosts.forEach(listBlogPostModel::addElement);
+		});
 	}
 
 	@Override

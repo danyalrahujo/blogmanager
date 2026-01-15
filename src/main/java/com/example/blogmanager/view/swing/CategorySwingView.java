@@ -135,7 +135,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		contentPane.add(addCatBtn, gbc_btnNewButton);
 		addCatBtn.addActionListener(e -> {
 			Category category = new Category(categoryId.getText(), categoryName.getText());
-			categoryController.addCategory(category);
+			new Thread(() -> categoryController.addCategory(category)).start();
 		});
 
 		clearBtn = new JButton("Clear");
@@ -222,7 +222,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 				return;
 
 			Category updated = new Category(selected.getId(), categoryName.getText());
-			categoryController.updateCategory(updated);
+			new Thread(() -> categoryController.updateCategory(updated)).start();
 		});
 
 		deleteBtn = new JButton("Delete");
@@ -236,7 +236,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		deleteBtn.addActionListener(e -> {
 			Category selected = list.getSelectedValue();
 			if (selected != null) {
-				categoryController.deleteCategory(selected);
+				new Thread(() -> categoryController.deleteCategory(selected)).start();
 			}
 		});
 
@@ -266,8 +266,9 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		clearBtn.setEnabled(enabled);
 	}
 
+	@Override
 	public void showErrorMessage(String message, Category category) {
-		errorMsg.setText(message + ": " + category);
+		SwingUtilities.invokeLater(() -> errorMsg.setText(message + ": " + category));
 	}
 
 	private String getDisplayString(Category category) {
@@ -275,17 +276,20 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	}
 
 	private void resetErrorLabel() {
-		errorMsg.setText("");
+		SwingUtilities.invokeLater(() -> errorMsg.setText(""));
 	}
 
 	@Override
 	public void displayCategories(List<Category> categories) {
-		categories.stream().forEach(listCategoryModel::addElement);
+		SwingUtilities.invokeLater(() -> {
+			listCategoryModel.clear();
+			categories.forEach(listCategoryModel::addElement);
+		});
 	}
 
 	@Override
 	public void addCategory(Category category) {
-		javax.swing.SwingUtilities.invokeLater(() -> {
+		SwingUtilities.invokeLater(() -> {
 			listCategoryModel.addElement(category);
 			errorMsg.setText("");
 		});

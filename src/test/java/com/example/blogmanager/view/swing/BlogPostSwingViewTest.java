@@ -19,6 +19,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.awaitility.Awaitility.await;
+import java.util.concurrent.TimeUnit;
+
 import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.model.BlogPost;
 import com.example.blogmanager.model.Category;
@@ -152,7 +155,8 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.comboBox("BlogPostCategoryComboBox").selectItem(0);
 		window.button(JButtonMatcher.withText("Create")).click();
 
-		verify(blogPostController).addBlogPost(new BlogPost("1", "Title", "Content", "Author", DATE, category));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(blogPostController)
+				.addBlogPost(new BlogPost("1", "Title", "Content", "Author", DATE, category)));
 	}
 
 	@Test
@@ -195,7 +199,8 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.comboBox("BlogPostCategoryComboBox").selectItem(0);
 		window.button(JButtonMatcher.withText("Update")).click();
 
-		verify(blogPostController).updateBlogPost(new BlogPost("1", "New", "New", "New", DATE, category));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(blogPostController)
+				.updateBlogPost(new BlogPost("1", "New", "New", "New", DATE, category)));
 	}
 
 	@Test
@@ -208,7 +213,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.list("BlogPostList").selectItem(0);
 		window.button("deleteBtn").click();
 
-		verify(blogPostController).deleteBlogPost(post);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(blogPostController).deleteBlogPost(post));
 	}
 
 	private void addCategories() {
@@ -415,7 +420,6 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.textBox("BlogPostContentTextBox").requireEmpty();
 		window.textBox("BlogPostCreationDateTextBox").requireEmpty();
 	}
-
 
 	@Test
 	@GUITest

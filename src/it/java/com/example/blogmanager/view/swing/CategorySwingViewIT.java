@@ -12,6 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.MongoDBContainer;
 
+import static org.awaitility.Awaitility.await;
+import java.util.concurrent.TimeUnit;
+
 import com.example.blogmanager.controller.CategoryController;
 import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.mongo.CategoryMongoRepository;
@@ -63,9 +66,11 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("CategoryNameTextBox").enterText("Tech");
 		window.button(JButtonMatcher.withText("Add Category")).click();
 
-		assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Tech"));
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Tech")));
 
-		assertThat(window.list("CategoryList").contents()).containsExactly("1 - Tech");
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> assertThat(window.list("CategoryList").contents()).containsExactly("1 - Tech"));
 	}
 
 	@Test
@@ -77,8 +82,10 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list("CategoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		assertThat(categoryRepository.findById("1")).isNull();
-		assertThat(window.list("CategoryList").contents()).isEmpty();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(categoryRepository.findById("1")).isNull());
+
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> assertThat(window.list("CategoryList").contents()).isEmpty());
 	}
 
 	@Test
@@ -91,9 +98,11 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("CategoryNameTextBox").enterText("Tech");
 		window.button(JButtonMatcher.withText("Add Category")).click();
 
-		assertThat(window.list("CategoryList").contents()).containsExactly("1 - Existing");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(window.list("CategoryList").contents()).containsExactly("1 - Existing"));
 
-		window.label("errorMsg").requireText("Category with ID 1 already exists.: " + new Category("1", "Tech"));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.label("errorMsg")
+				.requireText("Category with ID 1 already exists.: " + new Category("1", "Tech")));
 	}
 
 	@Test
@@ -110,9 +119,11 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("CategoryNameTextBox").setText("Updated Tech");
 		window.button(JButtonMatcher.withText("Update")).click();
 
-		assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Updated Tech"));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Updated Tech")));
 
-		assertThat(window.list("CategoryList").contents()).containsExactly("1 - Updated Tech");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(window.list("CategoryList").contents()).containsExactly("1 - Updated Tech"));
 	}
 
 	@Test
@@ -124,9 +135,11 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list("CategoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		assertThat(window.list("CategoryList").contents()).containsExactly("1 - Ghost");
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> assertThat(window.list("CategoryList").contents()).containsExactly("1 - Ghost"));
 
-		window.label("errorMsg").requireText("No category found with ID 1: " + category);
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> window.label("errorMsg").requireText("No category found with ID 1: " + category));
 	}
 
 }

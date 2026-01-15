@@ -12,6 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.MongoDBContainer;
 
+import static org.awaitility.Awaitility.await;
+import java.util.concurrent.TimeUnit;
+
 import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.model.BlogPost;
 import com.example.blogmanager.model.Category;
@@ -77,11 +80,11 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("BlogPostCreationDateTextBox").enterText("2025-04-01");
 		window.button(JButtonMatcher.withText("Create")).click();
 
-		assertThat(blogPostRepository.findById("1")).isEqualTo(
-				new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", new Category("cat1", "Tech")));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(blogPostRepository.findById("1")).isEqualTo(
+				new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", new Category("cat1", "Tech"))));
 
-		assertThat(window.list("BlogPostList").contents())
-				.containsExactly("1 - Hello - Author - 2025-04-01 - First post - Tech");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(window.list("BlogPostList").contents())
+				.containsExactly("1 - Hello - Author - 2025-04-01 - First post - Tech"));
 	}
 
 	@Test
@@ -94,8 +97,10 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list("BlogPostList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		assertThat(blogPostRepository.findById("1")).isNull();
-		assertThat(window.list("BlogPostList").contents()).isEmpty();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(blogPostRepository.findById("1")).isNull());
+
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> assertThat(window.list("BlogPostList").contents()).isEmpty());
 	}
 
 	@Test
@@ -117,11 +122,11 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Update")).click();
 
-		assertThat(blogPostRepository.findById("1"))
-				.isEqualTo(new BlogPost("1", "Updated", "Updated post", "Updated Author", "2025-05-01", category));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(blogPostRepository.findById("1"))
+				.isEqualTo(new BlogPost("1", "Updated", "Updated post", "Updated Author", "2025-05-01", category)));
 
-		assertThat(window.list("BlogPostList").contents())
-				.containsExactly("1 - Updated - Updated Author - 2025-05-01 - Updated post - Tech");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(window.list("BlogPostList").contents())
+				.containsExactly("1 - Updated - Updated Author - 2025-05-01 - Updated post - Tech"));
 	}
 
 	@Test
@@ -140,11 +145,12 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Create")).click();
 
-		assertThat(window.list("BlogPostList").contents())
-				.containsExactly("1 - Existing - Author - 2025-04-01 - Post - Tech");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(window.list("BlogPostList").contents())
+				.containsExactly("1 - Existing - Author - 2025-04-01 - Post - Tech"));
 
-		window.label("errorMsg").requireText("Blog post with ID 1 already exists.: "
-				+ new BlogPost("1", "New", "Content", "Author", "2025-06-01", category));
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> window.label("errorMsg").requireText("Blog post with ID 1 already exists.: "
+						+ new BlogPost("1", "New", "Content", "Author", "2025-06-01", category)));
 
 	}
 
@@ -158,10 +164,11 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list("BlogPostList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		assertThat(window.list("BlogPostList").contents())
-				.containsExactly("1 - Ghost - Author - 2025-01-01 - Post - Tech");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(window.list("BlogPostList").contents())
+				.containsExactly("1 - Ghost - Author - 2025-01-01 - Post - Tech"));
 
-		window.label("errorMsg").requireText("No blog post found with ID 1: " + blogPost);
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> window.label("errorMsg").requireText("No blog post found with ID 1: " + blogPost));
 	}
 
 }

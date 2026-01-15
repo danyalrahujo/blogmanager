@@ -12,6 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.MongoDBContainer;
 
+import static org.awaitility.Awaitility.await;
+import java.util.concurrent.TimeUnit;
+
 import com.example.blogmanager.controller.CategoryController;
 import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.mongo.CategoryMongoRepository;
@@ -62,7 +65,8 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		window.textBox("CategoryNameTextBox").enterText("Tech");
 		window.button(JButtonMatcher.withText("Add Category")).click();
 
-		assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Tech"));
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Tech")));
 	}
 
 	@Test
@@ -74,7 +78,7 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		window.list("CategoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		assertThat(categoryRepository.findById("1")).isNull();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(categoryRepository.findById("1")).isNull());
 	}
 
 	@Test
@@ -91,8 +95,10 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		window.textBox("CategoryNameTextBox").setText("Updated Tech");
 		window.button(JButtonMatcher.withText("Update")).click();
 
-		assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Updated Tech"));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(categoryRepository.findById("1")).isEqualTo(new Category("1", "Updated Tech")));
 
-		assertThat(window.list("CategoryList").contents()).containsExactly("1 - Updated Tech");
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(window.list("CategoryList").contents()).containsExactly("1 - Updated Tech"));
 	}
 }

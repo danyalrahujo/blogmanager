@@ -17,6 +17,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.awaitility.Awaitility.await;
+import java.util.concurrent.TimeUnit;
+
 import com.example.blogmanager.controller.CategoryController;
 import com.example.blogmanager.model.Category;
 
@@ -90,7 +93,8 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Add Category")).click();
 
-		verify(categoryController).addCategory(new Category("1", "Technology"));
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> verify(categoryController).addCategory(new Category("1", "Technology")));
 	}
 
 	@Test
@@ -127,7 +131,8 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Update")).click();
 
-		verify(categoryController).updateCategory(new Category("1", "New"));
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> verify(categoryController).updateCategory(new Category("1", "New")));
 	}
 
 	@Test
@@ -139,7 +144,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.list("CategoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		verify(categoryController).deleteCategory(category);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(categoryController).deleteCategory(category));
 	}
 
 	private String getDisplayString(Category category) {

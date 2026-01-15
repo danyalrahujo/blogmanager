@@ -12,6 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.MongoDBContainer;
 
+import static org.awaitility.Awaitility.await;
+import java.util.concurrent.TimeUnit;
+
 import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.model.BlogPost;
 import com.example.blogmanager.model.Category;
@@ -77,8 +80,8 @@ public class BlogPostModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		window.comboBox("BlogPostCategoryComboBox").selectItem("Tech");
 		window.button(JButtonMatcher.withText("Create")).click();
 
-		assertThat(blogPostRepository.findById("1"))
-				.isEqualTo(new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", new Category("1", "Tech")));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(blogPostRepository.findById("1")).isEqualTo(
+				new BlogPost("1", "Hello", "First post", "Author", "2025-04-01", new Category("1", "Tech"))));
 	}
 
 	@Test
@@ -91,7 +94,7 @@ public class BlogPostModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		window.list("BlogPostList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete")).click();
 
-		assertThat(blogPostRepository.findById("1")).isNull();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(blogPostRepository.findById("1")).isNull());
 	}
 
 	@Test
@@ -111,7 +114,7 @@ public class BlogPostModelViewControllerIT extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Update")).click();
 
-		assertThat(blogPostRepository.findById("1"))
-				.isEqualTo(new BlogPost("1", "Hello", "Updated post", "Author", "2025-05-01", category));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(blogPostRepository.findById("1"))
+				.isEqualTo(new BlogPost("1", "Hello", "Updated post", "Author", "2025-05-01", category)));
 	}
 }
