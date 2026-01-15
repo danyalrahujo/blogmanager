@@ -58,18 +58,6 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 
 	private DefaultListModel<BlogPost> listBlogPostModel;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					BlogPostSwingView frame = new BlogPostSwingView();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	public void setBlogPostController(BlogPostController blogPostController) {
 		this.blogPostController = blogPostController;

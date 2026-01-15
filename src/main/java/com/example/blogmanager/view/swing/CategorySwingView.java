@@ -43,18 +43,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	private DefaultListModel<Category> listCategoryModel;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					CategorySwingView frame = new CategorySwingView();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+
 
 	public void setCategoryController(CategoryController categoryController) {
 		this.categoryController = categoryController;
