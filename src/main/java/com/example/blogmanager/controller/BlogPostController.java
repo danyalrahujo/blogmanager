@@ -19,7 +19,7 @@ public class BlogPostController {
 		blogPostView.displayBlogPosts(blogPostRepository.findAll());
 	}
 
-	public void addBlogPost(BlogPost blogPost) {
+	public synchronized void addBlogPost(BlogPost blogPost) {
 		BlogPost existingBlogPost = blogPostRepository.findById(blogPost.getId());
 		if (existingBlogPost != null) {
 			blogPostView.showErrorMessage("Blog post with ID " + blogPost.getId() + " already exists.", blogPost);
@@ -30,7 +30,7 @@ public class BlogPostController {
 		blogPostView.addBlogPost(blogPost);
 	}
 
-	public void deleteBlogPost(BlogPost blogPost) {
+	public synchronized void deleteBlogPost(BlogPost blogPost) {
 		BlogPost existingBlogPost = blogPostRepository.findById(blogPost.getId());
 		if (existingBlogPost == null) {
 			blogPostView.showErrorMessage("No blog post found with ID " + blogPost.getId(), blogPost);
@@ -41,7 +41,7 @@ public class BlogPostController {
 		blogPostView.deleteBlogPost(blogPost);
 	}
 
-	public void updateBlogPost(BlogPost blogPost) {
+	public synchronized void updateBlogPost(BlogPost blogPost) {
 		BlogPost existingBlogPost = blogPostRepository.findById(blogPost.getId());
 		if (existingBlogPost == null) {
 			blogPostView.showErrorMessage("No blog post found with ID " + blogPost.getId(), blogPost);

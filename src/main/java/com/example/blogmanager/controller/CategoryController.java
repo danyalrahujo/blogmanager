@@ -18,7 +18,7 @@ public class CategoryController {
 		categoryView.displayCategories(categoryRepository.findAll());
 	}
 
-	public void addCategory(Category category) {
+	public synchronized void addCategory(Category category) {
 		Category existingCategory = categoryRepository.findById(category.getId());
 		if (existingCategory != null) {
 			categoryView.showErrorMessage("Category with ID " + category.getId() + " already exists.", category);
@@ -29,7 +29,7 @@ public class CategoryController {
 		categoryView.addCategory(category);
 	}
 
-	public void deleteCategory(Category category) {
+	public synchronized void deleteCategory(Category category) {
 		Category existingCategory = categoryRepository.findById(category.getId());
 		if (existingCategory == null) {
 			categoryView.showErrorMessage("No category found with ID " + category.getId(), category);
@@ -40,7 +40,7 @@ public class CategoryController {
 		categoryView.deleteCategory(category);
 	}
 
-	public void updateCategory(Category category) {
+	public synchronized void updateCategory(Category category) {
 		Category existingCategory = categoryRepository.findById(category.getId());
 		if (existingCategory == null) {
 			categoryView.showErrorMessage("No category found with ID " + category.getId(), category);
