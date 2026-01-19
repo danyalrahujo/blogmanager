@@ -49,7 +49,7 @@ public class BlogPostMongoRepositoryTest {
 	@Before
 	public void setup() {
 		client = new MongoClient(new ServerAddress(serverAddress));
-		repo = new BlogPostMongoRepository(client);
+		repo = new BlogPostMongoRepository(client,BLOG_DB_NAME, BLOG_COLLECTION_NAME);
 		MongoDatabase db = client.getDatabase(BLOG_DB_NAME);
 		db.drop();
 		raw = db.getCollection(BLOG_COLLECTION_NAME);
@@ -80,12 +80,71 @@ public class BlogPostMongoRepositoryTest {
 	}
 
 	@Test
+	public void testSaveWithCategory() {
+		Category category = new Category("c1", "Tech");
+		BlogPost post = new BlogPost("10", "With category", "Content", "Author", "01-02-2025", category);
+
+		repo.save(post);
+
+		BlogPost stored = repo.findById("10");
+
+		assertThat(stored.getCategory()).isNotNull();
+		assertThat(stored.getCategory().getId()).isEqualTo("c1");
+		assertThat(stored.getCategory().getName()).isEqualTo("Tech");
+	}
+
+	@Test
 	public void testFindByIdWhenFound() {
 		addRaw("42", "The Answer", "All about 42", "douglas");
 		addRaw("99", "Ninety-Nine", "Just test", "tester");
 
 		BlogPost b = repo.findById("99");
 		assertThat(b).isEqualTo(new BlogPost("99", "Ninety-Nine", "Just test", "tester", null, null));
+	}
+
+	@Test
+	public void testUpdateWithCategory() {
+		repo.save(new BlogPost("20", "Old", "Old", "A", null, null));
+
+		Category category = new Category("c2", "Life");
+		BlogPost updated = new BlogPost("20", "New", "New", "A", null, category);
+
+		repo.update(updated);
+
+		BlogPost stored = repo.findById("20");
+
+		assertThat(stored.getCategory()).isNotNull();
+		assertThat(stored.getCategory().getName()).isEqualTo("Life");
+	}
+
+	@Test
+	public void testFindByCategoryWhenMatchesExist() {
+		Category tech = new Category("c1", "Tech");
+		Category life = new Category("c2", "Life");
+
+		BlogPost p1 = new BlogPost("1", "Post1", "Content1", "A", null, tech);
+		BlogPost p2 = new BlogPost("2", "Post2", "Content2", "B", null, tech);
+		BlogPost p3 = new BlogPost("3", "Post3", "Content3", "C", null, life);
+
+		repo.save(p1);
+		repo.save(p2);
+		repo.save(p3);
+
+		List<BlogPost> result = repo.findByCategory("c1");
+
+		assertThat(result).containsExactlyInAnyOrder(p1, p2);
+	}
+
+	@Test
+	public void testFindByCategoryWhenNoMatches() {
+		Category tech = new Category("c1", "Tech");
+		BlogPost p1 = new BlogPost("1", "Post1", "Content1", "A", null, tech);
+
+		repo.save(p1);
+
+		List<BlogPost> result = repo.findByCategory("does-not-exist");
+
+		assertThat(result).isEmpty();
 	}
 
 	@Test

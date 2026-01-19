@@ -20,8 +20,8 @@ public class CategoryMongoRepository implements CategoryRepository {
 
 	private final MongoCollection<Document> categoryCollection;
 
-	public CategoryMongoRepository(MongoClient client) {
-		categoryCollection = client.getDatabase(CATEGORY_DB_NAME).getCollection(CATEGORY_COLLECTION_NAME);
+	public CategoryMongoRepository(MongoClient client, String databaseName, String collectionName) {
+		categoryCollection = client.getDatabase(databaseName).getCollection(collectionName);
 	}
 
 	@Override

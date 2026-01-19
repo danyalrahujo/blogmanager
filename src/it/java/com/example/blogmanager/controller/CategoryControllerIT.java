@@ -34,7 +34,7 @@ public class CategoryControllerIT {
 	@Before
 	public void setUp() {
 		closeable = MockitoAnnotations.openMocks(this);
-		categoryRepository = new CategoryMongoRepository(new MongoClient(new ServerAddress("localhost", mongoPort)));
+		categoryRepository = new CategoryMongoRepository(new MongoClient(new ServerAddress("localhost", mongoPort)),"blogmanager", "category");
 
 		for (Category category : categoryRepository.findAll()) {
 			categoryRepository.delete(category.getId());

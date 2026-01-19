@@ -45,7 +45,7 @@ public class CategoryMongoRepositoryTestcontainersIT {
 	@Before
 	public void setup() {
 		client = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
-		categoryRepository = new CategoryMongoRepository(client);
+		categoryRepository = new CategoryMongoRepository(client, CategoryMongoRepository.CATEGORY_DB_NAME,CategoryMongoRepository.CATEGORY_COLLECTION_NAME);
 		MongoDatabase database = client.getDatabase(CategoryMongoRepository.CATEGORY_DB_NAME);
 
 		database.drop();

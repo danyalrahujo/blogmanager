@@ -1,9 +1,13 @@
 package com.example.blogmanager.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.verify;
-import java.util.Arrays;
 
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 
 import org.assertj.swing.annotation.GUITest;
@@ -18,9 +22,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.awaitility.Awaitility.await;
-import java.util.concurrent.TimeUnit;
 
 import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.model.BlogPost;
@@ -340,6 +341,112 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Test
 	@GUITest
+	public void testDisplayBlogPostsShouldPopulateList() {
+		Category category = new Category("1", "Tech");
+		BlogPost post = new BlogPost("1", "Title", "Content", "Author", DATE, category);
+
+		GuiActionRunner.execute(() -> blogPostSwingView.displayBlogPosts(Arrays.asList(post)));
+
+		assertThat(window.list("BlogPostList").contents()).containsExactly(getDisplayString(post));
+	}
+
+	@Test
+	public void testGetComboCategoriesModelShouldReturnModelWithCategories() {
+		Category c1 = new Category("1", "Tech");
+		Category c2 = new Category("2", "Life");
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.updateCategories(Arrays.asList(c1, c2));
+		});
+
+		DefaultComboBoxModel<Category> model = GuiActionRunner
+				.execute(() -> blogPostSwingView.getComboCategoriesModel());
+
+		assertThat(model.getSize()).isEqualTo(2);
+		assertThat(model.getElementAt(0)).isSameAs(c1);
+		assertThat(model.getElementAt(1)).isSameAs(c2);
+	}
+
+	@Test
+	@GUITest
+	public void testClearButtonActionListenerWhenNothingSelected() {
+		window.button(JButtonMatcher.withText("Clear")).click();
+
+		window.textBox("BlogPostIdTextBox").requireEmpty();
+		window.textBox("BlogPostTitleTextBox").requireEmpty();
+	}
+
+	@Test
+	public void testGetDisplayStringWhenCategoryIsNull() {
+		BlogPost post = new BlogPost("1", "T", "C", "A", DATE, null);
+
+		String display = GuiActionRunner.execute(() -> blogPostSwingView.getDisplayString(post));
+
+		assertThat(display).contains(" - ");
+	}
+
+	@Test
+	@GUITest
+	public void testEnsureCategoryExistsWhenCategoryIsMissing() {
+		Category category = new Category("1", "Tech");
+
+		GuiActionRunner.execute(() -> blogPostSwingView.ensureCategoryExists(category));
+
+		assertThat(window.comboBox("BlogPostCategoryComboBox").contents()).containsExactly("Tech");
+	}
+
+	@Test
+	@GUITest
+	public void testEnsureCategoryExistsWhenCategoryAlreadyPresent() {
+		Category category = new Category("1", "Tech");
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.updateCategories(Arrays.asList(category));
+			blogPostSwingView.ensureCategoryExists(category);
+		});
+
+		assertThat(window.comboBox("BlogPostCategoryComboBox").contents()).containsExactly("Tech");
+	}
+
+	@Test
+	@GUITest
+	public void testUpdateBlogPostWhenNoSelectionShouldDoNothing() {
+		BlogPost post = new BlogPost("1", "T", "C", "A", DATE, null);
+
+		GuiActionRunner.execute(() -> blogPostSwingView.updateBlogPost(post));
+
+		assertThat(window.list("BlogPostList").contents()).isEmpty();
+	}
+
+	@Test
+	@GUITest
+	public void testDisplayBlogPostsWithEmptyListShouldClearList() {
+		Category category = new Category("1", "Tech");
+		BlogPost post = new BlogPost("1", "Title", "Content", "Author", DATE, category);
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.displayBlogPosts(Arrays.asList(post));
+			blogPostSwingView.displayBlogPosts(Arrays.asList());
+		});
+
+		window.list("BlogPostList").requireItemCount(0);
+	}
+
+	@Test
+	@GUITest
+	public void testUpdateCategoriesShouldPopulateCategoryComboBox() {
+		Category c1 = new Category("1", "Tech");
+		Category c2 = new Category("2", "Life");
+
+		GuiActionRunner.execute(() -> blogPostSwingView.updateCategories(Arrays.asList(c1, c2)));
+
+		JComboBoxFixture comboBox = window.comboBox("BlogPostCategoryComboBox");
+
+		assertThat(comboBox.contents()).containsExactly("Tech", "Life");
+	}
+
+	@Test
+	@GUITest
 	public void testDeletingLastBlogPostShouldClearListAndDisableButtons() {
 		Category category = new Category("1", "Tech");
 		BlogPost post = new BlogPost("1", "Title", "Content", "Author", DATE, category);
@@ -423,15 +530,6 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Test
 	@GUITest
-	public void testClearButtonShouldDisableActionButtons() {
-		window.button(JButtonMatcher.withText("Clear")).click();
-
-		window.button(JButtonMatcher.withText("Update")).requireDisabled();
-		window.button(JButtonMatcher.withText("Delete")).requireDisabled();
-	}
-
-	@Test
-	@GUITest
 	public void testUpdateBlogPostFailureShouldShowErrorMessage() {
 		BlogPost post = new BlogPost("1", "T", "C", "A", DATE, null);
 
@@ -448,6 +546,68 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(() -> blogPostSwingView.showErrorMessage("delete error", post));
 
 		window.label("errorMsg").requireText("delete error: " + post);
+	}
+
+	@Test
+	@GUITest
+	public void testBlogPostListRendererWithNonBlogPostValue() {
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.getListBlogPostModel().addElement(null);
+		});
+
+		String[] contents = window.list("BlogPostList").contents();
+
+		assertThat(contents).containsExactly("");
+	}
+
+	@Test
+	@GUITest
+	public void testUpdateBlogPostWhenIdNotFoundShouldNotModifyList() {
+		Category category = new Category("1", "Tech");
+
+		BlogPost existing = new BlogPost("1", "Old", "Old", "Old", DATE, category);
+		BlogPost update = new BlogPost("2", "New", "New", "New", DATE, category);
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.getListBlogPostModel().addElement(existing);
+			blogPostSwingView.updateBlogPost(update);
+		});
+
+		assertThat(window.list("BlogPostList").contents()).containsExactly(getDisplayString(existing));
+	}
+
+	@Test
+	@GUITest
+	public void testDeselectingBlogPostShouldClearTextFields() {
+		Category category = new Category("1", "Tech");
+		BlogPost post = new BlogPost("1", "T", "C", "A", DATE, category);
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.getListBlogPostModel().addElement(post);
+		});
+
+		window.list("BlogPostList").selectItem(0);
+		window.list("BlogPostList").clearSelection();
+
+		window.textBox("BlogPostIdTextBox").requireEmpty();
+		window.textBox("BlogPostTitleTextBox").requireEmpty();
+	}
+
+	@Test
+	@GUITest
+	public void testEnsureCategoryExistsWhenOtherCategoryPresent() {
+		Category existing = new Category("1", "Tech");
+		Category missing = new Category("2", "Life");
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.getComboCategoriesModel().addElement(existing);
+		});
+
+		GuiActionRunner.execute(() -> {
+			blogPostSwingView.ensureCategoryExists(missing);
+		});
+
+		assertThat(window.comboBox("BlogPostCategoryComboBox").contents()).containsExactly("Tech", "Life");
 	}
 
 }

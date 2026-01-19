@@ -35,15 +35,18 @@ public class BlogPostModelViewControllerIT extends AssertJSwingJUnitTestCase {
 	private BlogPostMongoRepository blogPostRepository;
 	private CategoryMongoRepository categoryRepository;
 	private BlogPostController blogPostController;
-
+	private BlogPostSwingView blogPostSwingView;
+	
+	
 	@Override
 	protected void onSetUp() {
 
 		mongoClient = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
 
-		blogPostRepository = new BlogPostMongoRepository(mongoClient);
-		categoryRepository = new CategoryMongoRepository(mongoClient);
-
+		blogPostRepository = new BlogPostMongoRepository(mongoClient,"blogmanager", "blogpost");
+		categoryRepository = new CategoryMongoRepository(mongoClient, "blogmanager","category");
+		
+		
 		for (BlogPost blogPost : blogPostRepository.findAll()) {
 			blogPostRepository.delete(blogPost.getId());
 		}
@@ -54,11 +57,10 @@ public class BlogPostModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		categoryRepository.save(new Category("1", "Tech"));
 
 		window = new FrameFixture(robot(), GuiActionRunner.execute(() -> {
-			BlogPostSwingView blogPostSwingView = new BlogPostSwingView();
-			blogPostController = new BlogPostController(blogPostSwingView, blogPostRepository);
-
-			blogPostSwingView.setBlogPostController(blogPostController);
+			blogPostSwingView = new BlogPostSwingView();
+			blogPostController = new BlogPostController(blogPostSwingView, blogPostRepository,categoryRepository);
 			blogPostSwingView.updateCategories(categoryRepository.findAll());
+			blogPostSwingView.setBlogPostController(blogPostController);
 			return blogPostSwingView;
 		}));
 

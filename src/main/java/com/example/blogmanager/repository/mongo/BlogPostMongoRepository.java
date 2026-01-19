@@ -20,8 +20,8 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 
 	private final MongoCollection<Document> blogPostCollection;
 
-	public BlogPostMongoRepository(MongoClient client) {
-		blogPostCollection = client.getDatabase(BLOG_DB_NAME).getCollection(BLOG_COLLECTION_NAME);
+	public BlogPostMongoRepository(MongoClient client, String databaseName, String collectionName) {
+		blogPostCollection = client.getDatabase(databaseName).getCollection(collectionName);
 	}
 
 	@Override

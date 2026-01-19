@@ -21,7 +21,7 @@ import com.example.blogmanager.model.BlogPost;
 import com.example.blogmanager.repository.BlogPostRepository;
 import com.example.blogmanager.view.BlogPostView;
 
-public class TestBlogPostController {
+public class BlogPostControllerTest {
 	@Mock
 	private BlogPostRepository blogPostRepository;
 
@@ -121,4 +121,6 @@ public class TestBlogPostController {
 		verify(blogPostView).showErrorMessage("No blog post found with ID 1", blogPost);
 		verifyNoMoreInteractions(ignoreStubs(blogPostRepository));
 	}
+
+
 }

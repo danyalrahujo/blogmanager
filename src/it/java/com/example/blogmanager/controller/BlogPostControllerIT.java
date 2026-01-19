@@ -37,8 +37,8 @@ public class BlogPostControllerIT {
 		closeable = MockitoAnnotations.openMocks(this);
 
 		MongoClient client = new MongoClient(new ServerAddress("localhost", mongoPort));
-		blogPostRepository = new BlogPostMongoRepository(client);
-		categoryRepository = new CategoryMongoRepository(client);
+		blogPostRepository = new BlogPostMongoRepository(client,"blogmanager", "blogpost");
+		categoryRepository = new CategoryMongoRepository(client, "blogmanager","category");
 
 		for (BlogPost blogPost : blogPostRepository.findAll()) {
 			blogPostRepository.delete(blogPost.getId());

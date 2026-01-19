@@ -1,12 +1,9 @@
 package com.example.blogmanager.view.swing;
 
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -52,20 +49,24 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 	private JComboBox<Category> categryBox;
 	private JLabel errorMsg;
 
+	CategorySwingView categoryView;
+
 	private DefaultComboBoxModel<Category> comboBoxCategoriesModel;
 
 	private BlogPostController blogPostController;
 
 	private DefaultListModel<BlogPost> listBlogPostModel;
 
-
 	public void setBlogPostController(BlogPostController blogPostController) {
 		this.blogPostController = blogPostController;
-
 	}
 
 	DefaultListModel<BlogPost> getListBlogPostModel() {
 		return listBlogPostModel;
+	}
+
+	DefaultComboBoxModel<Category> getComboCategoriesModel() {
+		return comboBoxCategoriesModel;
 	}
 
 	public BlogPostSwingView() {
@@ -189,8 +190,8 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		gbc_lblNewLabel_4.gridy = 4;
 		contentPane.add(lblNewLabel_4, gbc_lblNewLabel_4);
 
-		categryBox = new JComboBox<Category>();
 		comboBoxCategoriesModel = new DefaultComboBoxModel<>();
+		categryBox = new JComboBox<Category>(comboBoxCategoriesModel);
 		categryBox.setModel(comboBoxCategoriesModel);
 		categryBox.setName("BlogPostCategoryComboBox");
 		GridBagConstraints gbc_comboBox = new GridBagConstraints();
@@ -354,9 +355,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(deleteBtn, gbc_btnNewButton_3);
 		deleteBtn.addActionListener(e -> {
 			BlogPost selected = list_1.getSelectedValue();
-			if (selected != null) {
-				new Thread(() -> blogPostController.deleteBlogPost(selected)).start();
-			}
+			new Thread(() -> blogPostController.deleteBlogPost(selected)).start();
 		});
 
 		updateBtn = new JButton("Update");
@@ -370,8 +369,6 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(updateBtn, gbc_btnNewButton_2);
 		updateBtn.addActionListener(e -> {
 			BlogPost selected = list_1.getSelectedValue();
-			if (selected == null)
-				return;
 			BlogPost updated = new BlogPost(selected.getId(), BlogPostTxtTitle.getText(), BlogPostTxtContent.getText(),
 					BlogPostTxtAuthor.getText(), BlogPostTxtCreationDate.getText(),
 					(Category) categryBox.getSelectedItem());
@@ -379,10 +376,6 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		});
 
 		btnNewButton = new JButton("Category");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
@@ -425,22 +418,16 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		});
 	}
 
-	private void ensureCategoryExists(Category category) {
-		SwingUtilities.invokeLater(() -> {
-			for (int i = 0; i < comboBoxCategoriesModel.getSize(); i++) {
-				if (comboBoxCategoriesModel.getElementAt(i).equals(category)) {
-					return;
-				}
+	void ensureCategoryExists(Category category) {
+		for (int i = 0; i < comboBoxCategoriesModel.getSize(); i++) {
+			if (comboBoxCategoriesModel.getElementAt(i).equals(category)) {
+				return;
 			}
-			comboBoxCategoriesModel.addElement(category);
-		});
+		}
+		comboBoxCategoriesModel.addElement(category);
 	}
 
-	DefaultComboBoxModel<Category> getComboCategoriesModel() {
-		return comboBoxCategoriesModel;
-	}
-
-	private String getDisplayString(BlogPost blogPost) {
+	String getDisplayString(BlogPost blogPost) {
 		return blogPost.getId() + " - " + blogPost.getTitle() + " - " + blogPost.getAuthor() + " - "
 				+ blogPost.getCreationDate() + " - " + blogPost.getContent() + " - "
 				+ (blogPost.getCategory() != null ? blogPost.getCategory().getName() : "");
@@ -486,4 +473,5 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 			resetErrorLabel();
 		});
 	}
+
 }

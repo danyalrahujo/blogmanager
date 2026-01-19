@@ -1,14 +1,23 @@
 package com.example.blogmanager.controller;
 
-import com.example.blogmanager.view.BlogPostView;
-import com.example.blogmanager.repository.BlogPostRepository;
-
 import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.repository.BlogPostRepository;
+import com.example.blogmanager.repository.CategoryRepository;
+import com.example.blogmanager.view.BlogPostView;
 
 public class BlogPostController {
 
 	private BlogPostView blogPostView;
 	private BlogPostRepository blogPostRepository;
+	private CategoryRepository categoryRepository;
+
+	public BlogPostController(BlogPostView blogPostView, BlogPostRepository blogPostRepository,
+			CategoryRepository categoryRepository) {
+
+		this.blogPostView = blogPostView;
+		this.blogPostRepository = blogPostRepository;
+		this.categoryRepository = categoryRepository;
+	}
 
 	public BlogPostController(BlogPostView blogPostView, BlogPostRepository blogPostRepository) {
 		this.blogPostView = blogPostView;
@@ -51,5 +60,6 @@ public class BlogPostController {
 		blogPostRepository.update(blogPost);
 		blogPostView.updateBlogPost(blogPost);
 	}
+
 
 }

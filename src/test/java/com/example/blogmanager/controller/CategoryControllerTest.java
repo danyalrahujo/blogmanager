@@ -21,7 +21,7 @@ import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.CategoryRepository;
 import com.example.blogmanager.view.CategoryView;
 
-public class TestCategoryController {
+public class CategoryControllerTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;
@@ -119,4 +119,6 @@ public class TestCategoryController {
 		verify(categoryView).showErrorMessage("No category found with ID 1", category);
 		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
 	}
+
+
 }

@@ -38,7 +38,7 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 
 		mongoClient = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
 
-		categoryRepository = new CategoryMongoRepository(mongoClient);
+		categoryRepository = new CategoryMongoRepository(mongoClient, "blogmanager","category");
 
 		for (Category category : categoryRepository.findAll()) {
 			categoryRepository.delete(category.getId());

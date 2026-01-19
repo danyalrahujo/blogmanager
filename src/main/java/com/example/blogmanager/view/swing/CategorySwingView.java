@@ -1,7 +1,6 @@
 package com.example.blogmanager.view.swing;
 
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -39,11 +38,11 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	private JButton blogpostBtn;
 	private JLabel errorMsg;
 
+	BlogPostSwingView blogPostSwingView;
+
 	private CategoryController categoryController;
 
 	private DefaultListModel<Category> listCategoryModel;
-
-
 
 	public void setCategoryController(CategoryController categoryController) {
 		this.categoryController = categoryController;
@@ -207,9 +206,6 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		contentPane.add(updateBtn, gbc_btnNewButton_1);
 		updateBtn.addActionListener(e -> {
 			Category selected = list.getSelectedValue();
-			if (selected == null)
-				return;
-
 			Category updated = new Category(selected.getId(), categoryName.getText());
 			new Thread(() -> categoryController.updateCategory(updated)).start();
 		});
@@ -224,9 +220,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		contentPane.add(deleteBtn, gbc_btnNewButton_2);
 		deleteBtn.addActionListener(e -> {
 			Category selected = list.getSelectedValue();
-			if (selected != null) {
-				new Thread(() -> categoryController.deleteCategory(selected)).start();
-			}
+			new Thread(() -> categoryController.deleteCategory(selected)).start();
 		});
 
 		blogpostBtn = new JButton("BlogPosts");

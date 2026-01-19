@@ -33,8 +33,8 @@ public class BlogPostMongoRepositoryTestcontainersIT {
 	@Before
 	public void setup() {
 		client = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
-		blogPostRepository = new BlogPostMongoRepository(client);
-		categoryRepository = new CategoryMongoRepository(client);
+		blogPostRepository = new BlogPostMongoRepository(client,BlogPostMongoRepository.BLOG_DB_NAME, BlogPostMongoRepository.BLOG_COLLECTION_NAME);
+		categoryRepository = new CategoryMongoRepository(client, BlogPostMongoRepository.BLOG_DB_NAME,CategoryMongoRepository.CATEGORY_COLLECTION_NAME);
 
 		MongoDatabase database = client.getDatabase(BlogPostMongoRepository.BLOG_DB_NAME);
 		database.drop();

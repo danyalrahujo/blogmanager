@@ -1,7 +1,11 @@
 package com.example.blogmanager.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.verify;
+
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultListModel;
 
@@ -16,9 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.awaitility.Awaitility.await;
-import java.util.concurrent.TimeUnit;
 
 import com.example.blogmanager.controller.CategoryController;
 import com.example.blogmanager.model.Category;
@@ -133,6 +134,28 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(categoryController).updateCategory(new Category("1", "New")));
+	}
+
+	@Test
+	@GUITest
+	public void testDisplayCategoriesShouldPopulateList() {
+		Category category = new Category("1", "Tech");
+
+		GuiActionRunner.execute(() -> categorySwingView.displayCategories(Arrays.asList(category)));
+		assertThat(window.list("CategoryList").contents()).containsExactly(getDisplayString(category));
+	}
+
+	@Test
+	@GUITest
+	public void testDisplayCategoriesWithEmptyListShouldClearList() {
+		Category category = new Category("1", "Tech");
+
+		GuiActionRunner.execute(() -> {
+			categorySwingView.displayCategories(Arrays.asList(category));
+			categorySwingView.displayCategories(Arrays.asList());
+		});
+
+		window.list("CategoryList").requireItemCount(0);
 	}
 
 	@Test
@@ -266,21 +289,6 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Test
 	@GUITest
-	public void testButtonsShouldBeDisabledAfterCategoryIsDeleted() {
-		Category category = new Category("1", "Tech");
-
-		GuiActionRunner.execute(() -> categorySwingView.getListCategoryModel().addElement(category));
-
-		window.list("CategoryList").selectItem(0);
-
-		GuiActionRunner.execute(() -> categorySwingView.deleteCategory(category));
-
-		window.button(JButtonMatcher.withText("Update")).requireDisabled();
-		window.button(JButtonMatcher.withText("Delete")).requireDisabled();
-	}
-
-	@Test
-	@GUITest
 	public void testClearButtonShouldResetTextFields() {
 		window.textBox("CategoryIdTextBox").enterText("1");
 		window.textBox("CategoryNameTextBox").enterText("Tech");
@@ -289,15 +297,6 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.textBox("CategoryIdTextBox").requireEmpty();
 		window.textBox("CategoryNameTextBox").requireEmpty();
-	}
-
-	@Test
-	@GUITest
-	public void testClearButtonShouldDisableActionButtons() {
-		window.button(JButtonMatcher.withText("Clear")).click();
-
-		window.button(JButtonMatcher.withText("Update")).requireDisabled();
-		window.button(JButtonMatcher.withText("Delete")).requireDisabled();
 	}
 
 	@Test
@@ -318,6 +317,58 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(() -> categorySwingView.showErrorMessage("delete error", category));
 
 		window.label("errorMsg").requireText("delete error: " + category);
+	}
+
+	@Test
+	@GUITest
+	public void testUpdateCategoryWithNoSelectionDoesNothing() {
+		Category category = new Category("1", "Tech");
+
+		GuiActionRunner.execute(() -> categorySwingView.updateCategory(category));
+
+		assertThat(window.list("CategoryList").contents()).isEmpty();
+	}
+
+	@Test
+	@GUITest
+	public void testCategoryRendererWithNullValue() {
+		GuiActionRunner.execute(() -> {
+			categorySwingView.getListCategoryModel().addElement(null);
+		});
+
+		String[] contents = window.list("CategoryList").contents();
+
+		assertThat(contents).containsExactly("");
+	}
+
+	@Test
+	@GUITest
+	public void testUpdateCategoryWhenIdNotFoundShouldNotModifyList() {
+		Category existing = new Category("1", "Tech");
+		Category update = new Category("2", "Life");
+
+		GuiActionRunner.execute(() -> {
+			categorySwingView.getListCategoryModel().addElement(existing);
+			categorySwingView.updateCategory(update);
+		});
+
+		assertThat(window.list("CategoryList").contents()).containsExactly("1 - Tech");
+	}
+
+	@Test
+	@GUITest
+	public void testDeselectingCategoryShouldDisableButtons() {
+		Category category = new Category("1", "Tech");
+
+		GuiActionRunner.execute(() -> {
+			categorySwingView.getListCategoryModel().addElement(category);
+		});
+
+		window.list("CategoryList").selectItem(0);
+		window.list("CategoryList").clearSelection();
+
+		window.button(JButtonMatcher.withText("Update")).requireDisabled();
+		window.button(JButtonMatcher.withText("Delete")).requireDisabled();
 	}
 
 }

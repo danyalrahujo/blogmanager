@@ -48,7 +48,7 @@ public class CategoryMongoRepositoryTest {
 	@Before
 	public void setup() {
 		client = new MongoClient(new ServerAddress(serverAddress));
-		repo = new CategoryMongoRepository(client);
+		repo = new CategoryMongoRepository(client,CATEGORY_DB_NAME,CATEGORY_COLLECTION_NAME);
 		MongoDatabase db = client.getDatabase(CATEGORY_DB_NAME);
 		db.drop();
 		collection = db.getCollection(CATEGORY_COLLECTION_NAME);
