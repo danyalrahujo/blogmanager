@@ -1,6 +1,7 @@
 package com.example.blogmanager.app.swing;
 
 import java.awt.EventQueue;
+import java.util.concurrent.Callable;
 
 import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.controller.CategoryController;
@@ -11,31 +12,50 @@ import com.example.blogmanager.view.swing.CategorySwingView;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
-public class BlogManagerSwingApp {
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+@Command(mixinStandardHelpOptions = true)
+public class BlogManagerSwingApp implements Callable<Void> {
+
+	@Option(names = { "--mongo-host" }, description = "MongoDB host address")
+	private String mongoHost = "localhost";
+
+	@Option(names = { "--mongo-port" }, description = "MongoDB host port")
+	private int mongoPort = 27017;
+
+	@Option(names = { "--db-name" }, description = "Database name")
+	private String databaseName = "blogmanager";
+
+	@Option(names = { "--blogpost-collection" }, description = "BlogPost collection name")
+	private String blogPostCollection = "blogpost";
+
+	@Option(names = { "--category-collection" }, description = "Category collection name")
+	private String categoryCollection = "category";
+
 	public static void main(String[] args) {
+		new CommandLine(new BlogManagerSwingApp()).execute(args);
+	}
+
+	@Override
+	public Void call() {
 
 		EventQueue.invokeLater(() -> {
 			try {
-				String mongoHost = "localhost";
-				int mongoPort = 27017;
-
-				if (args.length > 0)
-					mongoHost = args[0];
-				if (args.length > 1)
-					mongoPort = Integer.parseInt(args[1]);
-
 				MongoClient mongoClient = new MongoClient(new ServerAddress(mongoHost, mongoPort));
 
-				CategoryMongoRepository categoryRepository = new CategoryMongoRepository(mongoClient, "blogmanager",
-						"category");
+				CategoryMongoRepository categoryRepository = new CategoryMongoRepository(mongoClient, databaseName,
+						categoryCollection);
 
-				BlogPostMongoRepository blogPostRepository = new BlogPostMongoRepository(mongoClient, "blogmanager",
-						"blogpost");
+				BlogPostMongoRepository blogPostRepository = new BlogPostMongoRepository(mongoClient, databaseName,
+						blogPostCollection);
 
 				CategorySwingView categoryView = new CategorySwingView();
 				BlogPostSwingView blogPostView = new BlogPostSwingView();
 
 				CategoryController categoryController = new CategoryController(categoryView, categoryRepository);
+
 				BlogPostController blogPostController = new BlogPostController(blogPostView, blogPostRepository,
 						categoryRepository);
 
@@ -46,5 +66,7 @@ public class BlogManagerSwingApp {
 				e.printStackTrace();
 			}
 		});
+
+		return null;
 	}
 }
