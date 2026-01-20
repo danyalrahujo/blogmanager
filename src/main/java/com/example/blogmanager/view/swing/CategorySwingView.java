@@ -44,6 +44,10 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	private DefaultListModel<Category> listCategoryModel;
 
+	public void setBlogPostSwingView(BlogPostSwingView blogPostSwingView) {
+		this.blogPostSwingView = blogPostSwingView;
+	}
+
 	public void setCategoryController(CategoryController categoryController) {
 		this.categoryController = categoryController;
 	}
@@ -230,6 +234,12 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		gbc_btnNewButton_4.gridx = 3;
 		gbc_btnNewButton_4.gridy = 7;
 		contentPane.add(blogpostBtn, gbc_btnNewButton_4);
+		blogpostBtn.addActionListener(e -> {
+			blogPostSwingView.refreshCategories();
+			blogPostSwingView.setVisible(true);
+			this.setVisible(false);
+			resetErrorLabel();
+		});
 
 		errorMsg = new JLabel("");
 		errorMsg.setName("errorMsg");

@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.example.blogmanager.controller.BlogPostController;
 import com.example.blogmanager.controller.CategoryController;
 import com.example.blogmanager.model.Category;
 
@@ -29,9 +30,13 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 	private FrameFixture window;
 	private CategorySwingView categorySwingView;
+	private BlogPostSwingView blogPostSwingView;
 
 	@Mock
 	private CategoryController categoryController;
+
+	@Mock
+	private BlogPostController blogPostController;
 
 	private AutoCloseable closeable;
 
@@ -40,7 +45,10 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		closeable = MockitoAnnotations.openMocks(this);
 		GuiActionRunner.execute(() -> {
 			categorySwingView = new CategorySwingView();
+			blogPostSwingView = new BlogPostSwingView();
 			categorySwingView.setCategoryController(categoryController);
+			categorySwingView.setBlogPostSwingView(blogPostSwingView);
+			blogPostSwingView.setBlogPostController(blogPostController);
 			return categorySwingView;
 		});
 		window = new FrameFixture(robot(), categorySwingView);
@@ -369,6 +377,15 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Update")).requireDisabled();
 		window.button(JButtonMatcher.withText("Delete")).requireDisabled();
+	}
+
+	@Test
+	@GUITest
+	public void clickingBlogPostsButtonSwitchesView() {
+		window.button(JButtonMatcher.withText("BlogPosts")).click();
+
+		assertThat(blogPostSwingView.isVisible()).isTrue();
+		assertThat(categorySwingView.isVisible()).isFalse();
 	}
 
 }

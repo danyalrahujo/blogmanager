@@ -37,8 +37,8 @@ public class BlogPostControllerIT {
 		closeable = MockitoAnnotations.openMocks(this);
 
 		MongoClient client = new MongoClient(new ServerAddress("localhost", mongoPort));
-		blogPostRepository = new BlogPostMongoRepository(client,"blogmanager", "blogpost");
-		categoryRepository = new CategoryMongoRepository(client, "blogmanager","category");
+		blogPostRepository = new BlogPostMongoRepository(client, "blogmanager", "blogpost");
+		categoryRepository = new CategoryMongoRepository(client, "blogmanager", "category");
 
 		for (BlogPost blogPost : blogPostRepository.findAll()) {
 			blogPostRepository.delete(blogPost.getId());
@@ -48,7 +48,7 @@ public class BlogPostControllerIT {
 		}
 
 		categoryRepository.save(new Category("cat1", "Tech"));
-		blogPostController = new BlogPostController(blogPostView, blogPostRepository);
+		blogPostController = new BlogPostController(blogPostView, blogPostRepository,categoryRepository);
 	}
 
 	@After
@@ -92,4 +92,5 @@ public class BlogPostControllerIT {
 		blogPostController.updateBlogPost(updated);
 		verify(blogPostView).updateBlogPost(updated);
 	}
+
 }

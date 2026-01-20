@@ -1,6 +1,9 @@
 package com.example.blogmanager.controller;
 
+import java.util.List;
+
 import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.BlogPostRepository;
 import com.example.blogmanager.repository.CategoryRepository;
 import com.example.blogmanager.view.BlogPostView;
@@ -17,11 +20,6 @@ public class BlogPostController {
 		this.blogPostView = blogPostView;
 		this.blogPostRepository = blogPostRepository;
 		this.categoryRepository = categoryRepository;
-	}
-
-	public BlogPostController(BlogPostView blogPostView, BlogPostRepository blogPostRepository) {
-		this.blogPostView = blogPostView;
-		this.blogPostRepository = blogPostRepository;
 	}
 
 	public void getAllBlogPosts() {
@@ -61,5 +59,9 @@ public class BlogPostController {
 		blogPostView.updateBlogPost(blogPost);
 	}
 
+	public void loadCategories() {
+		List<Category> categories = categoryRepository.findAll();
+		blogPostView.updateCategories(categories);
+	}
 
 }

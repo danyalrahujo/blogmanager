@@ -42,10 +42,9 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		mongoClient = new MongoClient(new ServerAddress(mongo.getHost(), mongo.getFirstMappedPort()));
 
-		blogPostRepository = new BlogPostMongoRepository(mongoClient,"blogmanager", "blogpost");
-		categoryRepository = new CategoryMongoRepository(mongoClient, "blogmanager","category");
-		
-		
+		blogPostRepository = new BlogPostMongoRepository(mongoClient, "blogmanager", "blogpost");
+		categoryRepository = new CategoryMongoRepository(mongoClient, "blogmanager", "category");
+
 		for (BlogPost blogPost : blogPostRepository.findAll()) {
 			blogPostRepository.delete(blogPost.getId());
 		}
@@ -57,7 +56,7 @@ public class BlogPostSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		window = new FrameFixture(robot(), GuiActionRunner.execute(() -> {
 			blogPostSwingView = new BlogPostSwingView();
-			blogPostController = new BlogPostController(blogPostSwingView, blogPostRepository,categoryRepository);
+			blogPostController = new BlogPostController(blogPostSwingView, blogPostRepository, categoryRepository);
 			blogPostSwingView.updateCategories(categoryRepository.findAll());
 			blogPostSwingView.setBlogPostController(blogPostController);
 			return blogPostSwingView;

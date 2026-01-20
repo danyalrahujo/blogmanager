@@ -32,6 +32,7 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	private FrameFixture window;
 	private BlogPostSwingView blogPostSwingView;
+	private CategorySwingView categorySwingView;
 
 	@Mock
 	private BlogPostController blogPostController;
@@ -45,6 +46,8 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		closeable = MockitoAnnotations.openMocks(this);
 		GuiActionRunner.execute(() -> {
 			blogPostSwingView = new BlogPostSwingView();
+			categorySwingView = new CategorySwingView();
+			blogPostSwingView.setCategoryView(categorySwingView);
 			blogPostSwingView.setBlogPostController(blogPostController);
 			return blogPostSwingView;
 		});
@@ -608,6 +611,16 @@ public class BlogPostSwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 
 		assertThat(window.comboBox("BlogPostCategoryComboBox").contents()).containsExactly("Tech", "Life");
+	}
+
+	@Test
+	@GUITest
+	public void clickingCategoryButtonSwitchesView() {
+		window.button(JButtonMatcher.withText("Category")).click();
+
+		assertThat(categorySwingView.isVisible()).isTrue();
+		assertThat(blogPostSwingView.isVisible()).isFalse();
+
 	}
 
 }

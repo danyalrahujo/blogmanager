@@ -18,7 +18,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.example.blogmanager.model.BlogPost;
+import com.example.blogmanager.model.Category;
 import com.example.blogmanager.repository.BlogPostRepository;
+import com.example.blogmanager.repository.CategoryRepository;
 import com.example.blogmanager.view.BlogPostView;
 
 public class BlogPostControllerTest {
@@ -27,6 +29,9 @@ public class BlogPostControllerTest {
 
 	@Mock
 	private BlogPostView blogPostView;
+
+	@Mock
+	private CategoryRepository categoryRepository;
 
 	@InjectMocks
 	private BlogPostController blogPostController;
@@ -53,7 +58,7 @@ public class BlogPostControllerTest {
 
 	@Test
 	public void testGetAllBlogPostsWithEmptyList() {
-		when(blogPostRepository.findAll()).thenReturn(null); // Mock an empty list
+		when(blogPostRepository.findAll()).thenReturn(null);
 
 		blogPostController.getAllBlogPosts();
 
@@ -122,5 +127,16 @@ public class BlogPostControllerTest {
 		verifyNoMoreInteractions(ignoreStubs(blogPostRepository));
 	}
 
+	@Test
+	public void loadCategoriesShouldUpdateView() {
+		Category category = new Category("cat1", "Tech");
+		when(categoryRepository.findAll()).thenReturn(asList(category));
+
+		BlogPostController controller = new BlogPostController(blogPostView, blogPostRepository, categoryRepository);
+
+		controller.loadCategories();
+
+		verify(blogPostView).updateCategories(asList(category));
+	}
 
 }

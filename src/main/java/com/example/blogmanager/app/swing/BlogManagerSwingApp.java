@@ -55,12 +55,22 @@ public class BlogManagerSwingApp implements Callable<Void> {
 				BlogPostSwingView blogPostView = new BlogPostSwingView();
 
 				CategoryController categoryController = new CategoryController(categoryView, categoryRepository);
-
 				BlogPostController blogPostController = new BlogPostController(blogPostView, blogPostRepository,
 						categoryRepository);
 
 				categoryView.setCategoryController(categoryController);
 				blogPostView.setBlogPostController(blogPostController);
+
+				blogPostView.setCategoryView(categoryView);
+				categoryView.setBlogPostSwingView(blogPostView);
+
+				categoryView.setVisible(false);
+				blogPostView.setVisible(true);
+
+				categoryController.getAllCategories();
+				blogPostController.getAllBlogPosts();
+				blogPostController.loadCategories();
+				
 
 			} catch (Exception e) {
 				e.printStackTrace();
