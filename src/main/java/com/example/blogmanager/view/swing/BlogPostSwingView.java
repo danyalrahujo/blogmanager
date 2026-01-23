@@ -60,7 +60,6 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 	public void setBlogPostController(BlogPostController blogPostController) {
 		this.blogPostController = blogPostController;
 	}
-	
 
 	public void setCategoryView(CategorySwingView categoryView) {
 		this.categoryView = categoryView;
@@ -315,10 +314,8 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 				BlogPostTxtCreationDate.setText(post.getCreationDate());
 
 				Category postCategory = post.getCategory();
-				if (postCategory != null) {
-					ensureCategoryExists(postCategory);
-					categryBox.setSelectedItem(postCategory);
-				}
+				ensureCategoryExists(postCategory);
+				categryBox.setSelectedItem(postCategory);
 
 				BlogPostTxtId.setEnabled(false);
 				createBtn.setEnabled(false);
