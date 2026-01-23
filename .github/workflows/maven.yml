@@ -26,4 +26,21 @@ jobs:
           restore-keys: ${{ runner.os }}-m2-
 
       - name: Build with Maven
-        run: xvfb-run mvn verify
+        run: xvfb-run mvn verify -Pjacoco
+      -  name: Coveralls Report
+         run: >
+            mvn coveralls:report
+            -DrepoToken=$COVERALLS_REPO_TOKEN
+            -DpullRequest=${{ github.event.pull_request.number }}
+         env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+      -  name: SonarCloud
+         run: >
+             mvn sonar:sonar 
+             -Dsonar.organization=danyalrahujo 
+             -Dsonar.host.url=https://sonarcloud.io
+             -Dsonar.projectKey=danyalrahujo_blogmanager
+         env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
