@@ -17,6 +17,12 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 
 	public static final String BLOG_COLLECTION_NAME = "blogPost";
 	public static final String BLOG_DB_NAME = "blogDatabase";
+	final String TITLE = "title";
+	final String AUTHOR = "author";
+	final String ID = "id";
+	final String CREATIONDATE = "creationDate";
+	final String CONTENT = " content";
+	final String CATEGORY = "category";
 
 	private final MongoCollection<Document> blogPostCollection;
 
@@ -26,14 +32,14 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 
 	@Override
 	public void save(BlogPost bp) {
-		Document doc = new Document().append("id", bp.getId()).append("title", bp.getTitle())
-				.append("content", bp.getContent()).append("author", bp.getAuthor())
-				.append("creationDate", bp.getCreationDate());
+		Document doc = new Document().append(ID, bp.getId()).append(TITLE, bp.getTitle())
+				.append(CONTENT, bp.getContent()).append(AUTHOR, bp.getAuthor())
+				.append(CREATIONDATE, bp.getCreationDate());
 
 		if (bp.getCategory() != null) {
 			Document catDoc = new Document().append("id", bp.getCategory().getId()).append("name",
 					bp.getCategory().getName());
-			doc.append("category", catDoc);
+			doc.append(CATEGORY, catDoc);
 		}
 
 		blogPostCollection.insertOne(doc);
@@ -53,16 +59,16 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 
 	@Override
 	public void update(BlogPost bp) {
-		Document update = new Document().append("title", bp.getTitle()).append("content", bp.getContent())
-				.append("author", bp.getAuthor()).append("creationDate", bp.getCreationDate());
+		Document update = new Document().append(TITLE, bp.getTitle()).append(CONTENT, bp.getContent())
+				.append(AUTHOR, bp.getAuthor()).append(CREATIONDATE, bp.getCreationDate());
 
 		if (bp.getCategory() != null) {
 			Document catDoc = new Document().append("id", bp.getCategory().getId()).append("name",
 					bp.getCategory().getName());
-			update.append("category", catDoc);
+			update.append(CATEGORY, catDoc);
 		} else {
 
-			update.append("category", null);
+			update.append(CATEGORY, null);
 		}
 
 		blogPostCollection.updateOne(Filters.eq("id", bp.getId()), new Document("$set", update));
@@ -80,13 +86,13 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	}
 
 	private BlogPost documentToBlogPost(Document d) {
-		String id = d.getString("id");
-		String title = d.getString("title");
-		String content = d.getString("content");
-		String author = d.getString("author");
-		String creationDate = d.getString("creationDate");
+		String id = d.getString(ID);
+		String title = d.getString(TITLE);
+		String content = d.getString(CONTENT);
+		String author = d.getString(AUTHOR);
+		String creationDate = d.getString(CREATIONDATE);
 
-		Document catDoc = d.get("category", Document.class);
+		Document catDoc = d.get(CATEGORY, Document.class);
 		Category category = (catDoc == null) ? null : new Category(catDoc.getString("id"), catDoc.getString("name"));
 
 		return new BlogPost(id, title, content, author, creationDate, category);

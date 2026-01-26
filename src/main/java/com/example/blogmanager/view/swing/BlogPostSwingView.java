@@ -53,7 +53,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 
 	private DefaultComboBoxModel<Category> comboBoxCategoriesModel;
 
-	private BlogPostController blogPostController;
+	private transient BlogPostController blogPostController;
 
 	private DefaultListModel<BlogPost> listBlogPostModel;
 
@@ -109,6 +109,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(BlogPostTxtId, gbc_textField);
 		BlogPostTxtId.setColumns(10);
 		BlogPostTxtId.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateCreateButtonState();
 			}
@@ -133,6 +134,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(BlogPostTxtTitle, gbc_textField_1);
 		BlogPostTxtTitle.setColumns(10);
 		BlogPostTxtTitle.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateCreateButtonState();
 			}
@@ -157,6 +159,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(BlogPostTxtAuthor, gbc_textField_2);
 		BlogPostTxtAuthor.setColumns(10);
 		BlogPostTxtAuthor.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateCreateButtonState();
 			}
@@ -181,6 +184,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(BlogPostTxtContent, gbc_textField_3);
 		BlogPostTxtContent.setColumns(10);
 		BlogPostTxtContent.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateCreateButtonState();
 			}
@@ -241,6 +245,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(BlogPostTxtCreationDate, gbc_textField_5);
 		BlogPostTxtCreationDate.setColumns(10);
 		BlogPostTxtCreationDate.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateCreateButtonState();
 			}

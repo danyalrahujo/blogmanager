@@ -40,7 +40,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	BlogPostSwingView blogPostSwingView;
 
-	private CategoryController categoryController;
+	private transient CategoryController categoryController;
 
 	private DefaultListModel<Category> listCategoryModel;
 
@@ -89,6 +89,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		contentPane.add(categoryId, gbc_categoryId);
 		categoryId.setColumns(10);
 		categoryId.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateAddCatButtonState();
 			}
@@ -113,6 +114,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		contentPane.add(categoryName, gbc_categoryName);
 		categoryName.setColumns(10);
 		categoryName.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyReleased(java.awt.event.KeyEvent e) {
 				updateAddCatButtonState();
 			}

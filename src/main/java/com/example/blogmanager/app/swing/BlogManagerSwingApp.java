@@ -73,7 +73,6 @@ public class BlogManagerSwingApp implements Callable<Void> {
 				
 
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		});
 
