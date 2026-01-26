@@ -199,7 +199,7 @@ public class BlogPostSwingView extends JFrame implements BlogPostView {
 		contentPane.add(lblNewLabel_4, gbc_lblNewLabel_4);
 
 		comboBoxCategoriesModel = new DefaultComboBoxModel<>();
-		categryBox = new JComboBox<Category>(comboBoxCategoriesModel);
+		categryBox = new JComboBox<>(comboBoxCategoriesModel);
 		categryBox.setModel(comboBoxCategoriesModel);
 		categryBox.setName("BlogPostCategoryComboBox");
 		GridBagConstraints gbc_comboBox = new GridBagConstraints();
