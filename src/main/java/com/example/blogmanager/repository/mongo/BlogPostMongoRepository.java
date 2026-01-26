@@ -21,7 +21,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	final String AUTHOR = "author";
 	final String ID = "id";
 	final String CREATIONDATE = "creationDate";
-	final String CONTENT = " content";
+	final String CONTENT = "content";
 	final String CATEGORY = "category";
 
 	private final MongoCollection<Document> blogPostCollection;
