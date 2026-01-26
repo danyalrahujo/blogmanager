@@ -17,12 +17,12 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 
 	public static final String BLOG_COLLECTION_NAME = "blogPost";
 	public static final String BLOG_DB_NAME = "blogDatabase";
-	final String TITLE = "title";
-	final String AUTHOR = "author";
-	final String ID = "id";
-	final String CREATIONDATE = "creationDate";
-	final String CONTENT = "content";
-	final String CATEGORY = "category";
+	private static final String TITLE = "title";
+	private static final String AUTHOR = "author";
+	private static final String ID = "id";
+	private static final String CREATION_DATE = "creationDate";
+	private static final String CONTENT = "content";
+	private static final String CATEGORY = "category";
 
 	private final MongoCollection<Document> blogPostCollection;
 
@@ -34,7 +34,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	public void save(BlogPost bp) {
 		Document doc = new Document().append(ID, bp.getId()).append(TITLE, bp.getTitle())
 				.append(CONTENT, bp.getContent()).append(AUTHOR, bp.getAuthor())
-				.append(CREATIONDATE, bp.getCreationDate());
+				.append(CREATION_DATE, bp.getCreationDate());
 
 		if (bp.getCategory() != null) {
 			Document catDoc = new Document().append("id", bp.getCategory().getId()).append("name",
@@ -60,7 +60,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 	@Override
 	public void update(BlogPost bp) {
 		Document update = new Document().append(TITLE, bp.getTitle()).append(CONTENT, bp.getContent())
-				.append(AUTHOR, bp.getAuthor()).append(CREATIONDATE, bp.getCreationDate());
+				.append(AUTHOR, bp.getAuthor()).append(CREATION_DATE, bp.getCreationDate());
 
 		if (bp.getCategory() != null) {
 			Document catDoc = new Document().append("id", bp.getCategory().getId()).append("name",
@@ -90,7 +90,7 @@ public class BlogPostMongoRepository implements BlogPostRepository {
 		String title = d.getString(TITLE);
 		String content = d.getString(CONTENT);
 		String author = d.getString(AUTHOR);
-		String creationDate = d.getString(CREATIONDATE);
+		String creationDate = d.getString(CREATION_DATE);
 
 		Document catDoc = d.get(CATEGORY, Document.class);
 		Category category = (catDoc == null) ? null : new Category(catDoc.getString("id"), catDoc.getString("name"));

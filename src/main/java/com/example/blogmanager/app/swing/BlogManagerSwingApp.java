@@ -11,6 +11,8 @@ import com.example.blogmanager.view.swing.BlogPostSwingView;
 import com.example.blogmanager.view.swing.CategorySwingView;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -73,6 +75,8 @@ public class BlogManagerSwingApp implements Callable<Void> {
 				
 
 			} catch (Exception e) {
+				Logger.getLogger(getClass().getName())
+				.log(Level.SEVERE, "Exception", e);
 			}
 		});
 
